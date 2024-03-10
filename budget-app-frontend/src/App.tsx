@@ -66,6 +66,16 @@ const App: React.FC = () => {
     setEditingItem({ id: '', description: '', amount: 0, date: '', categoryId: '' }); // Reset form for new entry
   };
 
+  const handleLogout = async () => {
+    const sessionHint = Cookies.get('session_hint');
+    
+    // Clear the session_hint cookie immediately after retrieval for security
+    Cookies.remove('session_hint');
+
+    // Redirect for logout
+    window.location.href = `/auth/logout?session_hint=${sessionHint}`;
+};
+
 
   if (isAuthLoading) {
     return <div className="animate-spin h-5 w-5 text-white">.</div>;
@@ -86,9 +96,10 @@ const App: React.FC = () => {
     <div className="container mt-5">
       <h1>Expense Tracker</h1>
       <button className="btn btn-primary mb-3" onClick={handleAddNew}>Add New Expense</button>
-      <button onClick={async () => {
+      <button onClick={handleLogout}>Logout</button>
+      {/* <button onClick={async () => {
         window.location.href = `/auth/logout?session_hint=${Cookies.get('session_hint')}`;
-      }}>Logout</button>
+      }}>Logout</button> */}
       {editingItem && <ExpenseItemForm onSave={handleSaveExpenseItem} itemToEdit={editingItem} />}
       <ExpenseItemsList items={expenseItems} onDelete={handleDeleteExpenseItem} onEdit={handleEditExpenseItem} />
     </div>

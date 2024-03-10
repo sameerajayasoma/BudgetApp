@@ -2,7 +2,6 @@ import axios from 'axios';
 
 import { ExpenseCategory } from '../types/ExpenseCategory';
 
-
 interface Window {
   config: {
     apiUrl: string;
