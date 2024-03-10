@@ -1,7 +1,19 @@
 import axios from 'axios';
+
 import { ExpenseCategory } from '../types/ExpenseCategory';
 
-const API_BASE_URL = 'http://localhost:8081/budgetapp'; // Adjust this URL to your actual API base URL
+
+interface Window {
+  config: {
+    apiUrl: string;
+    apiKey: string;
+  };
+}
+
+declare const window: Window;
+
+const API_BASE_URL = window.config.apiUrl; // Adjust this URL to your actual API base URL
+
 
 export const fetchExpenseCategories = async (): Promise<ExpenseCategory[]> => {
   try {

@@ -3,12 +3,36 @@ import { ExpenseItem } from './types/ExpenseItem';
 import { fetchExpenseItems, createExpenseItem, updateExpenseItem, deleteExpenseItem } from './services/ExpenseItemService';
 import ExpenseItemsList from './components/ExpenseItemsList';
 import ExpenseItemForm from './components/ExpenseItemForm';
-
+import Cookies from 'js-cookie';
 
 const App: React.FC = () => {
   const [expenseItems, setExpenseItems] = useState<ExpenseItem[]>([]);
   const [editingItem, setEditingItem] = useState<ExpenseItem | null>(null);
+  const [signedIn, setSignedIn] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
+  useEffect(() => {
+    if (Cookies.get('userinfo')) {
+      // We are here after a login
+      const userInfoCookie = Cookies.get('userinfo');
+      if (userInfoCookie) {
+        sessionStorage.setItem("userInfo", userInfoCookie);
+        var userInfo = JSON.parse(atob(userInfoCookie));
+        setSignedIn(true);
+        setUser(userInfo);
+      }
+      Cookies.remove('userinfo');
+    } else if (sessionStorage.getItem("userInfo")) {
+      // We have already logged in
+      var userInfo = JSON.parse(atob(sessionStorage.getItem("userInfo")!));
+      setSignedIn(true);
+      setUser(userInfo);
+    } else {
+      console.log("User is not signed in");
+    }
+    setIsAuthLoading(false);
+  }, []);
 
   useEffect(() => {
     loadExpenseItems();
@@ -18,12 +42,6 @@ const App: React.FC = () => {
     const items = await fetchExpenseItems();
     setExpenseItems(items);
   };
-
-  // const handleSaveExpenseItem1 = async (item: NewExpenseItem) => {
-  //   await createExpenseItem(item);
-  //   loadExpenseItems();
-  //   setEditingItem(null); // Reset editing item after saving
-  // };
 
   const handleSaveExpenseItem = async (item: ExpenseItem) => {
     if (item.id) {
@@ -45,16 +63,24 @@ const App: React.FC = () => {
   };
 
   const handleAddNew = () => {
-    setEditingItem({id: '', description: '', amount: 0, date: '', categoryId: '' }); // Reset form for new entry
+    setEditingItem({ id: '', description: '', amount: 0, date: '', categoryId: '' }); // Reset form for new entry
   };
 
-  // return (
-  //   <div className="App">
-  //     <h1>Expense Tracker</h1>
-  //     {/* Assume ExpenseItemForm is being used here to create or update expense items */}
-  //     <ExpenseItemsList items={expenseItems} onDelete={handleDeleteExpenseItem} />
-  //   </div>
-  // );
+
+  if (isAuthLoading) {
+    return <div className="animate-spin h-5 w-5 text-white">.</div>;
+  }
+
+  if (!signedIn) {
+    return (
+      <button
+        className="float-right bg-black bg-opacity-20 p-2 rounded-md text-sm my-3 font-medium text-white"
+        onClick={() => { window.location.href = "/auth/login" }}
+      >
+        Login
+      </button>
+    );
+  }
 
   return (
     <div className="container mt-5">

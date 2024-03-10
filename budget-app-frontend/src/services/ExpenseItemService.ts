@@ -2,8 +2,19 @@ import axios from 'axios';
 import { ExpenseItem } from '../types/ExpenseItem';
 import { NewExpenseItem } from '../types/NewExpenseItem';
 
+interface Window {
+  config: {
+    apiUrl: string;
+    apiKey: string;
+  };
+}
 
-const API_URL = 'http://localhost:8081/budgetapp/expenses'; // Adjust this URL to your API's actual endpoint
+declare const window: Window;
+
+
+// const API_URL = 'http://localhost:8081/budgetapp/expenses'; // Adjust this URL to your API's actual endpoint
+
+const API_URL = window.config.apiUrl + '/expenses';
 
 export const fetchExpenseItems = async (): Promise<ExpenseItem[]> => {
   const response = await axios.get<ExpenseItem[]>(API_URL);
