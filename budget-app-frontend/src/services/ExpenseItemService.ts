@@ -28,8 +28,7 @@ export const createExpenseItem = async (expenseItem: ExpenseItem): Promise<Expen
     date: expenseItem.date, 
     categoryId: expenseItem.categoryId
   };
-  console.log(newExpenseItem);
-  const response = await axios.post<ExpenseItem>(API_URL, expenseItem);
+  const response = await axios.post<ExpenseItem>(API_URL, newExpenseItem);
   return response.data;
 };
 
