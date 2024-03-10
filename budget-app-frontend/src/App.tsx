@@ -67,6 +67,7 @@ const App: React.FC = () => {
   };
 
   const handleLogout = async () => {
+    setSignedIn(false);
     const sessionHint = Cookies.get('session_hint');
     
     // Clear the session_hint cookie immediately after retrieval for security
