@@ -36,7 +36,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     loadExpenseItems();
-  }, []);
+  }, [signedIn]);
 
   const loadExpenseItems = async () => {
     const items = await fetchExpenseItems();
@@ -67,19 +67,22 @@ const App: React.FC = () => {
   };
 
   const handleLogout = async () => {
+    // Clear local user session indicators
     setSignedIn(false);
-    const sessionHint = Cookies.get('session_hint');
-    
+    setUser(null);
+    // setIsAuthLoading(true);
+    sessionStorage.removeItem("userInfo");
+
     // Clear the session_hint cookie immediately after retrieval for security
+    const sessionHint = Cookies.get('session_hint');
     Cookies.remove('session_hint');
 
     // Redirect for logout
     window.location.href = `/auth/logout?session_hint=${sessionHint}`;
-};
-
+  };
 
   if (isAuthLoading) {
-    return <div className="animate-spin h-5 w-5 text-white">.</div>;
+    return <div>Loading authentication status...</div>;
   }
 
   if (!signedIn) {
