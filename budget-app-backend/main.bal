@@ -7,7 +7,7 @@ import ballerina/uuid;
 
 final db:Client budgetAppDb = check new ();
 
-type NewExpenseItem record {|
+type ExpenseItemWithoutId record {|
     string description;
     decimal amount;
     string date;
@@ -48,7 +48,7 @@ service /budgetapp on new http:Listener(8081) {
         }
     }
 
-    resource function post expenses(NewExpenseItem newExpenseItem) returns db:ExpenseItem|http:InternalServerError {
+    resource function post expenses(ExpenseItemWithoutId newExpenseItem) returns db:ExpenseItem|http:InternalServerError {
         db:ExpenseItem newExpenseItemRecord = {id: uuid:createType4AsString(), ...newExpenseItem};
         string[]|persist:Error insertedIds = budgetAppDb->/expenseitems.post([newExpenseItemRecord]);
         if insertedIds is string[] {
@@ -59,7 +59,16 @@ service /budgetapp on new http:Listener(8081) {
         }
     }
 
-    resource function put expenses/[string id]() returns http:Ok|http:NotFound|http:InternalServerError {
+    resource function put expenses/[string id](db:ExpenseItem updatedExpenseItem) returns http:Ok|http:NotFound|http:InternalServerError {
+        db:ExpenseItemUpdate expenseItemUpdate = {description: updatedExpenseItem.description, amount: updatedExpenseItem.amount, date: updatedExpenseItem.date, categoryId: updatedExpenseItem.categoryId};
+        db:ExpenseItem|persist:Error updatedItem = budgetAppDb->/expenseitems/[id].put(expenseItemUpdate);
+        if updatedItem is db:ExpenseItem {
+            return http:OK;
+        } else if updatedItem is persist:NotFoundError {
+            return http:NOT_FOUND;
+        } else {
+            log:printError("Error occurred while updating the expense item.", expenseItemId = id, 'error = updatedItem);
+        }
         return http:INTERNAL_SERVER_ERROR;
     }
 
