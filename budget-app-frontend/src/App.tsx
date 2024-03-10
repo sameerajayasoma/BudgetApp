@@ -39,8 +39,12 @@ const App: React.FC = () => {
   }, [signedIn]);
 
   const loadExpenseItems = async () => {
-    const items = await fetchExpenseItems();
-    setExpenseItems(items);
+    if (signedIn) {
+      const items = await fetchExpenseItems();
+      setExpenseItems(items);
+    } else {
+      setExpenseItems([]); // Clear the items if not signed in
+    }
   };
 
   const handleSaveExpenseItem = async (item: ExpenseItem) => {
