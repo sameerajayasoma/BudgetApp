@@ -86,6 +86,9 @@ const App: React.FC = () => {
     <div className="container mt-5">
       <h1>Expense Tracker</h1>
       <button className="btn btn-primary mb-3" onClick={handleAddNew}>Add New Expense</button>
+      <button onClick={async () => {
+        window.location.href = `/auth/logout?session_hint=${Cookies.get('session_hint')}`;
+      }}>Logout</button>
       {editingItem && <ExpenseItemForm onSave={handleSaveExpenseItem} itemToEdit={editingItem} />}
       <ExpenseItemsList items={expenseItems} onDelete={handleDeleteExpenseItem} onEdit={handleEditExpenseItem} />
     </div>
