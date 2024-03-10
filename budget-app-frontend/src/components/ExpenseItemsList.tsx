@@ -9,7 +9,7 @@ interface ExpenseItemsListProps {
   onEdit: (item: ExpenseItem) => void;
 }
 
-const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete }) => {
+const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, onEdit }) => {
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
 
   // TODO Can we load categories only once during the app load?
@@ -39,6 +39,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete }) 
               <td>{item.date}</td>
               <td>{categoryMap.get(item.categoryId)?.name || 'No Category'}</td>
               <td>
+                <button className="btn btn-warning m-1" onClick={() => onEdit(item)}>Edit</button>
                 <button className="btn btn-danger" onClick={() => onDelete(item.id)}>Delete</button>
               </td>
             </tr>

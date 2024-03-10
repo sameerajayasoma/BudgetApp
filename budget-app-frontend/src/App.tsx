@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ExpenseItem } from './types/ExpenseItem';
-import { NewExpenseItem } from './types/NewExpenseItem';
 import { fetchExpenseItems, createExpenseItem, updateExpenseItem, deleteExpenseItem } from './services/ExpenseItemService';
 import ExpenseItemsList from './components/ExpenseItemsList';
 import ExpenseItemForm from './components/ExpenseItemForm';
@@ -8,7 +7,7 @@ import ExpenseItemForm from './components/ExpenseItemForm';
 
 const App: React.FC = () => {
   const [expenseItems, setExpenseItems] = useState<ExpenseItem[]>([]);
-  const [editingItem, setEditingItem] = useState<NewExpenseItem | null>(null);
+  const [editingItem, setEditingItem] = useState<ExpenseItem | null>(null);
 
 
   useEffect(() => {
@@ -20,13 +19,13 @@ const App: React.FC = () => {
     setExpenseItems(items);
   };
 
-  const handleSaveExpenseItem = async (item: NewExpenseItem) => {
-    await createExpenseItem(item);
-    loadExpenseItems();
-    setEditingItem(null); // Reset editing item after saving
-  };
+  // const handleSaveExpenseItem1 = async (item: NewExpenseItem) => {
+  //   await createExpenseItem(item);
+  //   loadExpenseItems();
+  //   setEditingItem(null); // Reset editing item after saving
+  // };
 
-  const handleSaveExpenseItem1 = async (item: ExpenseItem) => {
+  const handleSaveExpenseItem = async (item: ExpenseItem) => {
     if (item.id) {
       await updateExpenseItem(item.id, item);
     } else {
@@ -46,7 +45,7 @@ const App: React.FC = () => {
   };
 
   const handleAddNew = () => {
-    setEditingItem({description: '', amount: 0, date: '', categoryId: '' }); // Reset form for new entry
+    setEditingItem({id: '', description: '', amount: 0, date: '', categoryId: '' }); // Reset form for new entry
   };
 
   // return (

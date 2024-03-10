@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { NewExpenseItem } from '../types/NewExpenseItem';
+import { ExpenseItem } from '../types/ExpenseItem';
+
 
 import { ExpenseCategory } from '../types/ExpenseCategory';
 import { fetchExpenseCategories } from '../services/ExpenseCategoryService';
 
 interface ExpenseItemFormProps {
-    onSave: (item: NewExpenseItem) => void;
-    itemToEdit?: NewExpenseItem; // Optional prop for editing an existing item
+    onSave: (item: ExpenseItem) => void;
+    itemToEdit?: ExpenseItem; // Optional prop for editing an existing item
 }
 
 const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit }) => {
-    const [item, setItem] = useState<NewExpenseItem>({ description: '', amount: 0, date: '', categoryId: '' });
+    const [item, setItem] = useState<ExpenseItem>({ id: '', description: '', amount: 0, date: '', categoryId: '' });
     const [categories, setCategories] = useState<ExpenseCategory[]>([]);
 
     useEffect(() => {
@@ -35,7 +36,7 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
         }
         onSave(item);
         // Reset form to initial state
-        setItem({ description: '', amount: 0, date: '', categoryId: '' });
+        setItem({id:'', description: '', amount: 0, date: '', categoryId: '' });
     };
 
     return (

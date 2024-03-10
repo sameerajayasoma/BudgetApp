@@ -10,8 +10,14 @@ export const fetchExpenseItems = async (): Promise<ExpenseItem[]> => {
   return response.data;
 };
 
-export const createExpenseItem = async (expenseItem: NewExpenseItem): Promise<ExpenseItem> => {
-  console.log(expenseItem);
+export const createExpenseItem = async (expenseItem: ExpenseItem): Promise<ExpenseItem> => {
+  let newExpenseItem = {
+    description: expenseItem.description,
+    amount: expenseItem.amount, 
+    date: expenseItem.date, 
+    categoryId: expenseItem.categoryId
+  };
+  console.log(newExpenseItem);
   const response = await axios.post<ExpenseItem>(API_URL, expenseItem);
   return response.data;
 };
