@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ExpenseItem } from './types/ExpenseItem';
 import { NewExpenseItem } from './types/NewExpenseItem';
-
 import { fetchExpenseItems, createExpenseItem, updateExpenseItem, deleteExpenseItem } from './services/ExpenseItemService';
 import ExpenseItemsList from './components/ExpenseItemsList';
 import ExpenseItemForm from './components/ExpenseItemForm';
 import Cookies from 'js-cookie';
+import { Spinner } from 'react-bootstrap';
 
 const App: React.FC = () => {
   const [expenseItems, setExpenseItems] = useState<ExpenseItem[]>([]);
@@ -101,8 +101,18 @@ const App: React.FC = () => {
     window.location.href = `/auth/logout?session_hint=${sessionHint}`;
   };
 
+  // if (isAuthLoading) {
+  //   return <div>Loading authentication status...</div>;
+  // }
+
   if (isAuthLoading) {
-    return <div>Loading authentication status...</div>;
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </div>
+    );
   }
 
   if (!signedIn) {
@@ -130,11 +140,26 @@ const App: React.FC = () => {
     );
   }
 
+  // return (
+  //   <div className="container mt-5">
+  //     <h1>Expense Tracker</h1>
+  //     <button className="btn btn-primary m-1" onClick={handleAddNew}>Add New Expense</button>
+  //     <button className="btn btn-danger pull-right" onClick={handleLogout}>Logout</button>
+  //     {editingItem && <ExpenseItemForm onSave={handleSaveExpenseItem} itemToEdit={editingItem} />}
+  //     <ExpenseItemsList items={expenseItems} onDelete={handleDeleteExpenseItem} onEdit={handleEditExpenseItem} isLoading={isLoading} />
+  //   </div>
+  // );
+
   return (
     <div className="container mt-5">
+      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+        <div className="container-fluid">
+          <a className="navbar-brand" href="#">BudgetApp</a>
+          <button className="btn btn-outline-danger my-2 my-sm-0" type="submit" onClick={handleLogout}>Logout</button>
+        </div>
+      </nav>
       <h1>Expense Tracker</h1>
-      <button className="btn btn-primary m-1" onClick={handleAddNew}>Add New Expense</button>
-      <button className="btn btn-danger pull-right" onClick={handleLogout}>Logout</button>
+      {!isLoading && <button className="btn btn-primary m-1" onClick={handleAddNew}>Add New Expense</button>}
       {editingItem && <ExpenseItemForm onSave={handleSaveExpenseItem} itemToEdit={editingItem} />}
       <ExpenseItemsList items={expenseItems} onDelete={handleDeleteExpenseItem} onEdit={handleEditExpenseItem} isLoading={isLoading} />
     </div>
