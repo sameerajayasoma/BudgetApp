@@ -37,7 +37,7 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
         setItem({ id: '', description: '', amount: 0, date: '', categoryId: '' });
     };
 
-    const handleCancel = () => {
+    const handleReset = () => {
         // Reset the item state to initial form values
         setItem({ id: '', description: '', amount: 0, date: '', categoryId: '' });
     };
@@ -105,15 +105,12 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
                     ))}
                 </select>
             </div>
-            {/* <button type="submit" className="btn btn-primary">
-                Save
-            </button> */}
-            <div className="form-group d-flex justify-content-between mt-3">
-                <button type="submit" className="btn btn-primary">
+            <div className="form-group d-flex mt-3">
+                <button type="submit" className="btn btn-primary m-1">
                     Save
                 </button>
-                <button type="button" className="btn btn-secondary" onClick={handleCancel}>
-                    Cancel
+                <button type="button" className="btn btn-secondary m-1" onClick={handleReset}>
+                    Reset
                 </button>
             </div>
         </form>

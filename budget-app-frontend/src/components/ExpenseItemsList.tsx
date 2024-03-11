@@ -29,6 +29,8 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
     setShowCommentModal(true);
   };
 
+  const bgClasses = ['bg-light', 'bg-secondary'];
+
   if (isLoading) {
     return (
       <div>
@@ -88,8 +90,8 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
         </div>
       </div>
       <div className="d-md-none"> {/* Cards shown on screens smaller than md */}
-        {items.map((item) => (
-          <div key={item.id} className="card mb-3">
+        {items.map((item, index) => (
+          <div key={item.id} className={`card mb-3 ${bgClasses[index % bgClasses.length]} text-white`}>
             <div className="card-body">
               <h5 className="card-title">{item.description}</h5>
               <p className="card-text">Amount: {item.amount.toFixed(2)}</p>
