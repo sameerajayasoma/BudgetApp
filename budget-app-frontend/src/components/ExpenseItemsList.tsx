@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ExpenseItem } from '../types/ExpenseItem';
 import { ExpenseCategory } from '../types/ExpenseCategory';
 import { fetchExpenseCategories } from '../services/ExpenseCategoryService';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
 
 interface ExpenseItemsListProps {
   items: ExpenseItem[];
@@ -12,6 +14,8 @@ interface ExpenseItemsListProps {
 
 const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, onEdit, isLoading }) => {
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [currentComment, setCurrentComment] = useState('');
 
   // TODO Can we load categories only once during the app load?
   useEffect(() => {
@@ -19,6 +23,11 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
   }, []);
 
   const categoryMap = new Map(categories.map(category => [category.id, category]));
+
+  const handleShowCommentClick = (comment: string): void => {
+    setCurrentComment(comment);
+    setShowCommentModal(true);
+  };
 
   if (isLoading) {
     return (
@@ -29,8 +38,9 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
             <tr>
               <th>Description</th>
               <th>Amount</th>
-              <th>Comment</th>
               <th>Date</th>
+              <th>Category</th>
+              <th>Comment</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -48,8 +58,9 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
           <tr>
             <th>Description</th>
             <th>Amount</th>
-            <th>Comment</th>
             <th>Date</th>
+            <th>Category</th>
+            <th>Comment</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -58,9 +69,11 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
             <tr key={item.id}>
               <td>{item.description}</td>
               <td>{item.amount.toFixed(2)}</td>
-              <td>{item.comment || ""}</td>
               <td>{item.date}</td>
               <td>{categoryMap.get(item.categoryId)?.name || 'No Category'}</td>
+              <td>
+                <button className="btn btn-info btn-sm m-1" onClick={() => handleShowCommentClick(item.comment || "No Comment")}>Show Comment</button>
+              </td>
               <td>
                 <button className="btn btn-warning m-1" onClick={() => onEdit(item)}>Edit</button>
                 <button className="btn btn-danger" onClick={() => onDelete(item.id)}>Delete</button>
@@ -70,6 +83,18 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
         </tbody>
       </table>
       {items.length === 0 && <p>No expense items found.</p>}
+      
+      <Modal show={showCommentModal} onHide={() => setShowCommentModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Comment</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{currentComment}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowCommentModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
