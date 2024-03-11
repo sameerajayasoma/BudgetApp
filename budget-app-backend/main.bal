@@ -25,6 +25,7 @@ service /budgetapp on new http:Listener(8081) {
 
     resource function get expenses() returns db:ExpenseItem[]|http:InternalServerError {
         db:ExpenseItem[]|error expenseItems = from var expense in budgetAppDb->/expenseitems(targetType = db:ExpenseItem)
+            order by expense.date ascending
             select expense;
         if expenseItems is error {
             log:printError("Error occurred while retrieving the list of expense items.", 'error = expenseItems);
