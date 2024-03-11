@@ -21,9 +21,26 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
     }, [itemToEdit]);
 
 
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const { name, value } = e.target;
+    //     setItem({ ...item, [name]: name === 'amount' ? parseFloat(value) || 0 : value });
+    // };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setItem({ ...item, [name]: name === 'amount' ? parseFloat(value) || 0 : value });
+    
+        if (name === 'amount') {
+            // Regex to check if the value is a valid number (including incomplete decimals)
+            const isValidNumber = /^-?\d*\.?\d*$/.test(value);
+    
+            if (isValidNumber || value === "") {
+                // Update state with the string value to preserve user input
+                setItem({ ...item, [name]: parseFloat(value) });
+            }
+        } else {
+            // Handle changes for other fields normally
+            setItem({ ...item, [name]: value });
+        }
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
