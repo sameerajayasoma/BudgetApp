@@ -12,7 +12,7 @@ type ExpenseItemWithoutId record {|
     decimal amount;
     string date;
     string categoryId;
-    string? comment;
+    string comment?;
 |};
 
 @http:ServiceConfig {
@@ -47,7 +47,14 @@ service /budgetapp on new http:Listener(8081) {
     }
 
     resource function post expenses(ExpenseItemWithoutId newExpenseItem) returns db:ExpenseItem|http:InternalServerError {
-        db:ExpenseItem newExpenseItemRecord = {id: uuid:createType4AsString(), ...newExpenseItem};
+        db:ExpenseItem newExpenseItemRecord = {
+            id: uuid:createType4AsString(),
+            description: newExpenseItem.description,
+            amount: newExpenseItem.amount,
+            date: newExpenseItem.date,
+            categoryId: newExpenseItem.categoryId,
+            comment: newExpenseItem.comment
+        };
         string[]|persist:Error insertedIds = budgetAppDb->/expenseitems.post([newExpenseItemRecord]);
         if insertedIds is string[] {
             return newExpenseItemRecord;
