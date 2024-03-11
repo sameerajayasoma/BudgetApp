@@ -13,7 +13,7 @@ interface ExpenseItemFormProps {
 const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit }) => {
     const [item, setItem] = useState<NewExpenseItem>({
         id: '',
-        description: '', amount: '0', date: '', categoryId: ''
+        description: '', amount: '', date: '', categoryId: ''
     });
     const [categories, setCategories] = useState<ExpenseCategory[]>([]);
     const [errors, setErrors] = useState({
@@ -87,12 +87,12 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
 
         onSave(item);
         // Reset form to initial state
-        setItem({ id: '', description: '', amount: '0', date: '', categoryId: '' });
+        setItem({ id: '', description: '', amount: '', date: '', categoryId: '' });
     };
 
     const handleReset = () => {
         // Reset the item state to initial form values
-        setItem({ id: '', description: '', amount: '0', date: '', categoryId: '' });
+        setItem({ id: '', description: '', amount: '', date: '', categoryId: '' });
     };
 
     return (

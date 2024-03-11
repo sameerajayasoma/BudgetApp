@@ -83,7 +83,7 @@ const App: React.FC = () => {
   };
 
   const handleAddNew = () => {
-    setEditingItem({ id: '', description: '', amount: '0', date: '', categoryId: '' }); // Reset form for new entry
+    setEditingItem({ id: '', description: '', amount: '', date: '', categoryId: '' }); // Reset form for new entry
   };
 
   const handleLogout = async () => {
