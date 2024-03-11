@@ -50,7 +50,7 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
         // Field-specific validation
         if (name === 'amount') {
             // General number structure check, including negative numbers and decimal points
-            if (!/^-?\d*\.?\d*$/.test(value)) {
+            if (!value.trim() || !/^-?\d*\.?\d*$/.test(value)) {
                 newErrors[name] = 'Please enter a valid number.';
             } else if (value.endsWith('.')) { // Specific check for trailing decimal point
                 // If you want to allow a trailing dot as a valid input, remove this condition
@@ -72,10 +72,6 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // if (!item.description || !item.amount || !item.date || !item.categoryId) {
-        //     alert('Please fill in all fields');
-        //     return;
-        // }
 
         // Check if there are any errors
         const hasErrors = Object.values(errors).some(error => error !== '');
@@ -83,6 +79,12 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
             toast.error("Please correct the errors before submitting.");
             return;
         }
+
+        if (!item.description || !item.amount || !item.date || !item.categoryId) {
+            toast.error("Please fill in all fields before submitting.");
+            return;
+        }
+
         onSave(item);
         // Reset form to initial state
         setItem({ id: '', description: '', amount: '0', date: '', categoryId: '' });
