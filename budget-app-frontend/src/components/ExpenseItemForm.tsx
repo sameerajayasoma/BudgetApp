@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ExpenseItem } from '../types/ExpenseItem';
-
-
 import { ExpenseCategory } from '../types/ExpenseCategory';
 import { fetchExpenseCategories } from '../services/ExpenseCategoryService';
 
@@ -11,7 +9,7 @@ interface ExpenseItemFormProps {
 }
 
 const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit }) => {
-    const [item, setItem] = useState<ExpenseItem>({ id: '', description: '', amount: 0, date: '', categoryId: '' });
+    const [item, setItem] = useState<ExpenseItem>({ id: '', description: '', amount: 0, date: '',categoryId: '' });
     const [categories, setCategories] = useState<ExpenseCategory[]>([]);
 
     useEffect(() => {
@@ -62,6 +60,17 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
                     value={item.amount.toString()}
                     onChange={handleChange}
                     step="0.01"
+                />
+            </div>
+            <div className="form-group">
+                <label htmlFor="comment">Comment</label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="comment"
+                    name="comment"
+                    value={item.comment}
+                    onChange={handleChange}
                 />
             </div>
             <div className="form-group">

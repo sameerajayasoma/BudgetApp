@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { ExpenseItem } from '../types/ExpenseItem';
-import { NewExpenseItem } from '../types/NewExpenseItem';
 
 interface Window {
   config: {
@@ -10,9 +9,6 @@ interface Window {
 }
 
 declare const window: Window;
-
-
-// const API_URL = 'http://localhost:8081/budgetapp/expenses'; // Adjust this URL to your API's actual endpoint
 
 const API_URL = window.config.apiUrl + '/expenses';
 
@@ -26,6 +22,7 @@ export const createExpenseItem = async (expenseItem: ExpenseItem): Promise<Expen
     description: expenseItem.description,
     amount: expenseItem.amount, 
     date: expenseItem.date, 
+    comment: expenseItem.comment,
     categoryId: expenseItem.categoryId
   };
   const response = await axios.post<ExpenseItem>(API_URL, newExpenseItem);

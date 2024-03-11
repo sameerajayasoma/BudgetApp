@@ -5,6 +5,7 @@ export interface ExpenseItem {
     description: string;
     amount: number;
     date: string;
+    comment?: string;
     categoryId: string;
     category?: ExpenseCategory;
   }

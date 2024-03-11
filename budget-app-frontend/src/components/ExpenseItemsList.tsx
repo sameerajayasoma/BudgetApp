@@ -29,6 +29,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
             <tr>
               <th>Description</th>
               <th>Amount</th>
+              <th>Comment</th>
               <th>Date</th>
               <th>Actions</th>
             </tr>
@@ -47,6 +48,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
           <tr>
             <th>Description</th>
             <th>Amount</th>
+            <th>Comment</th>
             <th>Date</th>
             <th>Actions</th>
           </tr>
@@ -56,6 +58,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
             <tr key={item.id}>
               <td>{item.description}</td>
               <td>{item.amount.toFixed(2)}</td>
+              <td>{item.comment || ""}</td>
               <td>{item.date}</td>
               <td>{categoryMap.get(item.categoryId)?.name || 'No Category'}</td>
               <td>

@@ -100,17 +100,6 @@ const App: React.FC = () => {
     return <div>Loading authentication status...</div>;
   }
 
-  // if (!signedIn) {
-  //   return (
-  //     <button
-  //       className="float-right bg-black bg-opacity-20 p-2 rounded-md text-sm my-3 font-medium text-white"
-  //       onClick={() => { window.location.href = "/auth/login" }}
-  //     >
-  //       Login
-  //     </button>
-  //   );
-  // }
-
   if (!signedIn) {
     return (
       <div className="container d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
