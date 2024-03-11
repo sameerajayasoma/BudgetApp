@@ -12,14 +12,12 @@ type ExpenseItemWithoutId record {|
     decimal amount;
     string date;
     string categoryId;
+    string comment;
 |};
 
 @http:ServiceConfig {
     cors: {
         allowOrigins: ["http://localhost:3000"],
-        // allowCredentials: true,
-        // allowHeaders: ["CORELATION_ID", "Authorization", "Content-Type", "ngrok-skip-browser-warning"],
-        // exposeHeaders: ["X-CUSTOM-HEADER"],
         maxAge: 84900
     }
 }
@@ -60,7 +58,13 @@ service /budgetapp on new http:Listener(8081) {
     }
 
     resource function put expenses/[string id](db:ExpenseItem updatedExpenseItem) returns http:Ok|http:NotFound|http:InternalServerError {
-        db:ExpenseItemUpdate expenseItemUpdate = {description: updatedExpenseItem.description, amount: updatedExpenseItem.amount, date: updatedExpenseItem.date, categoryId: updatedExpenseItem.categoryId};
+        db:ExpenseItemUpdate expenseItemUpdate = {
+            description: updatedExpenseItem.description,
+            amount: updatedExpenseItem.amount,
+            date: updatedExpenseItem.date,
+            categoryId: updatedExpenseItem.categoryId,
+            comment: updatedExpenseItem.comment
+        };
         db:ExpenseItem|persist:Error updatedItem = budgetAppDb->/expenseitems/[id].put(expenseItemUpdate);
         if updatedItem is db:ExpenseItem {
             return http:OK;

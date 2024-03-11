@@ -5,6 +5,7 @@ type ExpenseItem record {|
     string description;
     decimal amount;
     string date;
+    string comment;
     ExpenseCategory category;
     // User user;
 |};

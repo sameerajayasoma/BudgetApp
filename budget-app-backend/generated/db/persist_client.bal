@@ -28,6 +28,7 @@ public isolated client class Client {
                 description: {columnName: "description"},
                 amount: {columnName: "amount"},
                 date: {columnName: "date"},
+                comment: {columnName: "comment"},
                 categoryId: {columnName: "categoryId"},
                 "category.id": {relation: {entityName: "category", refField: "id"}},
                 "category.name": {relation: {entityName: "category", refField: "name"}},
@@ -52,6 +53,7 @@ public isolated client class Client {
                 "expenseItems[].description": {relation: {entityName: "expenseItems", refField: "description"}},
                 "expenseItems[].amount": {relation: {entityName: "expenseItems", refField: "amount"}},
                 "expenseItems[].date": {relation: {entityName: "expenseItems", refField: "date"}},
+                "expenseItems[].comment": {relation: {entityName: "expenseItems", refField: "comment"}},
                 "expenseItems[].categoryId": {relation: {entityName: "expenseItems", refField: "categoryId"}}
             },
             keyFields: ["id"],
