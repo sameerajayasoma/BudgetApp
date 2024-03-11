@@ -11,6 +11,7 @@ const App: React.FC = () => {
   const [signedIn, setSignedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (Cookies.get('userinfo')) {
@@ -40,8 +41,18 @@ const App: React.FC = () => {
 
   const loadExpenseItems = async () => {
     if (signedIn) {
-      const items = await fetchExpenseItems();
-      setExpenseItems(items);
+      setIsLoading(true); // Start loading
+      try {
+        const items = await fetchExpenseItems();
+        setExpenseItems(items);
+      } catch (error) {
+        console.error("Failed to fetch expense items:", error);
+        // Handle error (e.g., set an error state here)
+      } finally {
+        setIsLoading(false); // End loading
+      }
+      // const items = await fetchExpenseItems();
+      // setExpenseItems(items);
     } else {
       setExpenseItems([]); // Clear the items if not signed in
     }
@@ -109,7 +120,7 @@ const App: React.FC = () => {
         window.location.href = `/auth/logout?session_hint=${Cookies.get('session_hint')}`;
       }}>Logout</button> */}
       {editingItem && <ExpenseItemForm onSave={handleSaveExpenseItem} itemToEdit={editingItem} />}
-      <ExpenseItemsList items={expenseItems} onDelete={handleDeleteExpenseItem} onEdit={handleEditExpenseItem} />
+      <ExpenseItemsList items={expenseItems} onDelete={handleDeleteExpenseItem} onEdit={handleEditExpenseItem} isLoading={isLoading} />
     </div>
   );
 };
