@@ -9,7 +9,7 @@ interface ExpenseItemFormProps {
 }
 
 const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit }) => {
-    const [item, setItem] = useState<ExpenseItem>({ id: '', description: '', amount: 0, date: '',categoryId: '' });
+    const [item, setItem] = useState<ExpenseItem>({ id: '', description: '', amount: 0, date: '', categoryId: '' });
     const [categories, setCategories] = useState<ExpenseCategory[]>([]);
 
     useEffect(() => {
@@ -34,7 +34,12 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
         }
         onSave(item);
         // Reset form to initial state
-        setItem({id:'', description: '', amount: 0, date: '', categoryId: '' });
+        setItem({ id: '', description: '', amount: 0, date: '', categoryId: '' });
+    };
+
+    const handleCancel = () => {
+        // Reset the item state to initial form values
+        setItem({ id: '', description: '', amount: 0, date: '', categoryId: '' });
     };
 
     return (
@@ -100,9 +105,17 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
                     ))}
                 </select>
             </div>
-            <button type="submit" className="btn btn-primary">
+            {/* <button type="submit" className="btn btn-primary">
                 Save
-            </button>
+            </button> */}
+            <div className="form-group d-flex justify-content-between mt-3">
+                <button type="submit" className="btn btn-primary">
+                    Save
+                </button>
+                <button type="button" className="btn btn-secondary" onClick={handleCancel}>
+                    Cancel
+                </button>
+            </div>
         </form>
     );
 };
