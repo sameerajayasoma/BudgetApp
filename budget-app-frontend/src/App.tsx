@@ -100,25 +100,47 @@ const App: React.FC = () => {
     return <div>Loading authentication status...</div>;
   }
 
+  // if (!signedIn) {
+  //   return (
+  //     <button
+  //       className="float-right bg-black bg-opacity-20 p-2 rounded-md text-sm my-3 font-medium text-white"
+  //       onClick={() => { window.location.href = "/auth/login" }}
+  //     >
+  //       Login
+  //     </button>
+  //   );
+  // }
+
   if (!signedIn) {
     return (
-      <button
-        className="float-right bg-black bg-opacity-20 p-2 rounded-md text-sm my-3 font-medium text-white"
-        onClick={() => { window.location.href = "/auth/login" }}
-      >
-        Login
-      </button>
+      <div className="container d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+        <div className="card shadow-lg" style={{ width: "400px" }}>
+          <div className="card-body">
+            <h2 className="card-title text-center">BudgetApp Login</h2>
+            <p className="text-center">Welcome back! Please login to your account.</p>
+            <div className="d-grid gap-2">
+              <button
+                className="btn btn-primary btn-lg"
+                onClick={() => { window.location.href = "/auth/login"; }}
+              >
+                Sign in
+              </button>
+              {/* Optionally, add more OAuth provider buttons here */}
+            </div>
+          </div>
+          <div className="card-footer text-muted text-center">
+            Need an account? <a href="/signup">Sign up</a>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
     <div className="container mt-5">
       <h1>Expense Tracker</h1>
-      <button className="btn btn-primary mb-3" onClick={handleAddNew}>Add New Expense</button>
-      <button onClick={handleLogout}>Logout</button>
-      {/* <button onClick={async () => {
-        window.location.href = `/auth/logout?session_hint=${Cookies.get('session_hint')}`;
-      }}>Logout</button> */}
+      <button className="btn btn-primary m-1" onClick={handleAddNew}>Add New Expense</button>
+      <button className="btn btn-danger pull-right" onClick={handleLogout}>Logout</button>
       {editingItem && <ExpenseItemForm onSave={handleSaveExpenseItem} itemToEdit={editingItem} />}
       <ExpenseItemsList items={expenseItems} onDelete={handleDeleteExpenseItem} onEdit={handleEditExpenseItem} isLoading={isLoading} />
     </div>
