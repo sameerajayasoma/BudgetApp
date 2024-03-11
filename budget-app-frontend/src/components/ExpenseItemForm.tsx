@@ -49,8 +49,12 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
 
         // Field-specific validation
         if (name === 'amount') {
-            if (!value || !/^-?\d*\.?\d*$/.test(value)) {
+            // General number structure check, including negative numbers and decimal points
+            if (!/^-?\d*\.?\d*$/.test(value)) {
                 newErrors[name] = 'Please enter a valid number.';
+            } else if (value.endsWith('.')) { // Specific check for trailing decimal point
+                // If you want to allow a trailing dot as a valid input, remove this condition
+                newErrors[name] = 'The number cannot end with a decimal point.';
             } else if (parseFloat(value) <= 0) {
                 newErrors[name] = 'Amount must be greater than 0.';
             }

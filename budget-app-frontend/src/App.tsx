@@ -63,7 +63,6 @@ const App: React.FC = () => {
   const handleSaveExpenseItem = async (item: NewExpenseItem) => {
     // Validate the item
 
-
     if (item.id) {
       await updateExpenseItem(item.id, item);
     } else {

@@ -21,7 +21,7 @@ export const fetchExpenseItems = async (): Promise<ExpenseItem[]> => {
 export const createExpenseItem = async (expenseItem: NewExpenseItem): Promise<ExpenseItem> => {
   let newExpenseItem = {
     description: expenseItem.description,
-    amount: expenseItem.amount, 
+    amount: parseFloat(expenseItem.amount), 
     date: expenseItem.date, 
     comment: expenseItem.comment,
     categoryId: expenseItem.categoryId
@@ -30,7 +30,15 @@ export const createExpenseItem = async (expenseItem: NewExpenseItem): Promise<Ex
   return response.data;
 };
 
-export const updateExpenseItem = async (id: string, expenseItem: Partial<NewExpenseItem>): Promise<ExpenseItem> => {
+export const updateExpenseItem = async (id: string, expenseItem: NewExpenseItem): Promise<ExpenseItem> => {
+  let newExpenseItem = {
+    id:expenseItem.id,
+    description: expenseItem.description,
+    amount: parseFloat(expenseItem.amount), 
+    date: expenseItem.date, 
+    comment: expenseItem.comment,
+    categoryId: expenseItem.categoryId
+  };
   const response = await axios.put<ExpenseItem>(`${API_URL}/${id}`, expenseItem);
   return response.data;
 };
