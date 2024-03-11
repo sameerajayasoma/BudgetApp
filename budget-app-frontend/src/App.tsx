@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ExpenseItem } from './types/ExpenseItem';
+import { NewExpenseItem } from './types/NewExpenseItem';
+
 import { fetchExpenseItems, createExpenseItem, updateExpenseItem, deleteExpenseItem } from './services/ExpenseItemService';
 import ExpenseItemsList from './components/ExpenseItemsList';
 import ExpenseItemForm from './components/ExpenseItemForm';
@@ -7,7 +9,7 @@ import Cookies from 'js-cookie';
 
 const App: React.FC = () => {
   const [expenseItems, setExpenseItems] = useState<ExpenseItem[]>([]);
-  const [editingItem, setEditingItem] = useState<ExpenseItem | null>(null);
+  const [editingItem, setEditingItem] = useState<NewExpenseItem | null>(null);
   const [signedIn, setSignedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
@@ -58,7 +60,10 @@ const App: React.FC = () => {
     }
   };
 
-  const handleSaveExpenseItem = async (item: ExpenseItem) => {
+  const handleSaveExpenseItem = async (item: NewExpenseItem) => {
+    // Validate the item
+
+
     if (item.id) {
       await updateExpenseItem(item.id, item);
     } else {
@@ -69,7 +74,8 @@ const App: React.FC = () => {
   };
 
   const handleEditExpenseItem = (item: ExpenseItem) => {
-    setEditingItem(item);
+    let expenseItem: NewExpenseItem = { amount: item.amount.toString(), categoryId: item.categoryId, date: item.date, description: item.description, id: item.id };
+    setEditingItem(expenseItem);
   };
 
   const handleDeleteExpenseItem = async (id: string) => {
@@ -78,7 +84,7 @@ const App: React.FC = () => {
   };
 
   const handleAddNew = () => {
-    setEditingItem({ id: '', description: '', amount: 0, date: '', categoryId: '' }); // Reset form for new entry
+    setEditingItem({ id: '', description: '', amount: '0', date: '', categoryId: '' }); // Reset form for new entry
   };
 
   const handleLogout = async () => {

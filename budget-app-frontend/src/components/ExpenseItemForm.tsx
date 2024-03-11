@@ -1,16 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { ExpenseItem } from '../types/ExpenseItem';
+import { NewExpenseItem } from '../types/NewExpenseItem';
 import { ExpenseCategory } from '../types/ExpenseCategory';
 import { fetchExpenseCategories } from '../services/ExpenseCategoryService';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface ExpenseItemFormProps {
-    onSave: (item: ExpenseItem) => void;
-    itemToEdit?: ExpenseItem; // Optional prop for editing an existing item
+    onSave: (item: NewExpenseItem) => void;
+    itemToEdit?: NewExpenseItem; // Optional prop for editing an existing item
 }
 
 const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit }) => {
-    const [item, setItem] = useState<ExpenseItem>({ id: '', description: '', amount: 0, date: '', categoryId: '' });
+    const [item, setItem] = useState<NewExpenseItem>({
+        id: '',
+        description: '', amount: '0', date: '', categoryId: ''
+    });
     const [categories, setCategories] = useState<ExpenseCategory[]>([]);
+    const [errors, setErrors] = useState({
+        description: '',
+        amount: '',
+        date: '',
+        comment: '',
+        categoryId: '',
+    });
 
     useEffect(() => {
         // If itemToEdit changes and is not undefined, set it as the current item
@@ -21,116 +33,142 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
     }, [itemToEdit]);
 
 
-    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const { name, value } = e.target;
-    //     setItem({ ...item, [name]: name === 'amount' ? parseFloat(value) || 0 : value });
-    // };
+    const handleChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setItem({ ...item, [name]: value });
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-    
+
+        // Update form field value
+        setItem({ ...item, [name]: value });
+
+        // Reset error for current field
+        const newErrors = { ...errors, [name]: '' };
+
+        // Field-specific validation
         if (name === 'amount') {
-            // Regex to check if the value is a valid number (including incomplete decimals)
-            const isValidNumber = /^-?\d*\.?\d*$/.test(value);
-    
-            if (isValidNumber || value === "") {
-                // Update state with the string value to preserve user input
-                setItem({ ...item, [name]: parseFloat(value) });
+            if (!value || !/^-?\d*\.?\d*$/.test(value)) {
+                newErrors[name] = 'Please enter a valid number.';
+            } else if (parseFloat(value) <= 0) {
+                newErrors[name] = 'Amount must be greater than 0.';
             }
-        } else {
-            // Handle changes for other fields normally
-            setItem({ ...item, [name]: value });
+        } else if (name === 'description' && !value.trim()) {
+            newErrors[name] = 'Description is required.';
+        } else if (name === 'date' && !value) {
+            newErrors[name] = 'Date is required.';
+        } else if (name === 'categoryId' && !value) {
+            newErrors[name] = 'Category is required.';
         }
+
+        // Update errors state
+        setErrors(newErrors);
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!item.description || !item.amount || !item.date || !item.categoryId) {
-            alert('Please fill in all fields');
+        // if (!item.description || !item.amount || !item.date || !item.categoryId) {
+        //     alert('Please fill in all fields');
+        //     return;
+        // }
+
+        // Check if there are any errors
+        const hasErrors = Object.values(errors).some(error => error !== '');
+        if (hasErrors) {
+            toast.error("Please correct the errors before submitting.");
             return;
         }
         onSave(item);
         // Reset form to initial state
-        setItem({ id: '', description: '', amount: 0, date: '', categoryId: '' });
+        setItem({ id: '', description: '', amount: '0', date: '', categoryId: '' });
     };
 
     const handleReset = () => {
         // Reset the item state to initial form values
-        setItem({ id: '', description: '', amount: 0, date: '', categoryId: '' });
+        setItem({ id: '', description: '', amount: '0', date: '', categoryId: '' });
     };
 
     return (
-        <form onSubmit={handleSubmit} className="mt-4">
-            <div className="form-group">
-                <label htmlFor="description">Description</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    id="description"
-                    name="description"
-                    value={item.description}
-                    onChange={handleChange}
-                />
-            </div>
-            <div className="form-group">
-                <label htmlFor="amount">Amount</label>
-                <input
-                    type="number"
-                    className="form-control"
-                    id="amount"
-                    name="amount"
-                    value={item.amount.toString()}
-                    onChange={handleChange}
-                    step="0.01"
-                />
-            </div>
-            <div className="form-group">
-                <label htmlFor="comment">Comment</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    id="comment"
-                    name="comment"
-                    value={item.comment}
-                    onChange={handleChange}
-                />
-            </div>
-            <div className="form-group">
-                <label htmlFor="date">Date</label>
-                <input
-                    type="date"
-                    className="form-control"
-                    id="date"
-                    name="date"
-                    value={item.date}
-                    onChange={handleChange}
-                />
-            </div>
-            <div className="form-group">
-                <label htmlFor="category">Category</label>
-                <select
-                    className="form-control"
-                    id="categoryId"
-                    value={item.categoryId}
-                    onChange={(e) => setItem({ ...item, categoryId: e.target.value })}
-                >
-                    <option value="" disabled>Select a category</option> {/* Placeholder option */}
-                    {categories.map((category) => (
-                        <option key={category.id} value={category.id}>
-                            {category.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div className="form-group d-flex mt-3">
-                <button type="submit" className="btn btn-primary m-1">
-                    Save
-                </button>
-                <button type="button" className="btn btn-secondary m-1" onClick={handleReset}>
-                    Reset
-                </button>
-            </div>
-        </form>
+        <div>
+            <ToastContainer />
+            <form onSubmit={handleSubmit} className="mt-4">
+                <div className="form-group">
+                    <label htmlFor="description">Description</label>
+                    <input
+                        type="text"
+                        // className="form-control"
+                        className={`form-control ${errors.description ? 'is-invalid' : ''}`}
+                        id="description"
+                        name="description"
+                        value={item.description}
+                        onChange={handleChange}
+                    />
+                    {errors.description && <div className="invalid-feedback">{errors.description}</div>}
+                </div>
+                <div className="form-group">
+                    <label htmlFor="amount">Amount</label>
+                    <input
+                        type="text"
+                        className={`form-control ${errors.amount ? 'is-invalid' : ''}`}
+                        id="amount"
+                        name="amount"
+                        value={item.amount}
+                        onChange={handleChange}
+                        step="0.01"
+                    />
+                    {errors.amount && <div className="invalid-feedback">{errors.amount}</div>}
+                </div>
+                <div className="form-group">
+                    <label htmlFor="comment">Comment</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="comment"
+                        name="comment"
+                        value={item.comment}
+                        onChange={handleChange}
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="date">Date</label>
+                    <input
+                        type="date"
+                        className={`form-control ${errors.date ? 'is-invalid' : ''}`}
+                        id="date"
+                        name="date"
+                        value={item.date}
+                        onChange={handleChange}
+                    />
+                    {errors.date && <div className="invalid-feedback">{errors.date}</div>}
+                </div>
+                <div className="form-group">
+                    <label htmlFor="category">Category</label>
+                    <select
+                        className={`form-control ${errors.categoryId ? 'is-invalid' : ''}`}
+                        id="categoryId"
+                        value={item.categoryId}
+                        onChange={(e) => setItem({ ...item, categoryId: e.target.value })}
+                    >
+                        <option value="" disabled>Select a category</option> {/* Placeholder option */}
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.categoryId && <div className="invalid-feedback">{errors.categoryId}</div>}
+                </div>
+                <div className="form-group d-flex mt-3">
+                    <button type="submit" className="btn btn-primary m-1">
+                        Save
+                    </button>
+                    <button type="button" className="btn btn-secondary m-1" onClick={handleReset}>
+                        Reset
+                    </button>
+                </div>
+            </form>
+        </div>
     );
 };
 

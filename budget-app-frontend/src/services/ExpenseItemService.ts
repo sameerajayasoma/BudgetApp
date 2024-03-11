@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { ExpenseItem } from '../types/ExpenseItem';
+import { NewExpenseItem } from '../types/NewExpenseItem';
 
 interface Window {
   config: {
@@ -17,7 +18,7 @@ export const fetchExpenseItems = async (): Promise<ExpenseItem[]> => {
   return response.data;
 };
 
-export const createExpenseItem = async (expenseItem: ExpenseItem): Promise<ExpenseItem> => {
+export const createExpenseItem = async (expenseItem: NewExpenseItem): Promise<ExpenseItem> => {
   let newExpenseItem = {
     description: expenseItem.description,
     amount: expenseItem.amount, 
@@ -29,7 +30,7 @@ export const createExpenseItem = async (expenseItem: ExpenseItem): Promise<Expen
   return response.data;
 };
 
-export const updateExpenseItem = async (id: string, expenseItem: Partial<ExpenseItem>): Promise<ExpenseItem> => {
+export const updateExpenseItem = async (id: string, expenseItem: Partial<NewExpenseItem>): Promise<ExpenseItem> => {
   const response = await axios.put<ExpenseItem>(`${API_URL}/${id}`, expenseItem);
   return response.data;
 };
