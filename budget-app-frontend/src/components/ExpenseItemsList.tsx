@@ -51,7 +51,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
   }
 
   return (
-    <div>
+    <div className="table-responsive">
       <h2 className="mt-3">Expense Items</h2>
       <table className="table table-striped mt-3">
         <thead className="thead-dark">
@@ -83,7 +83,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
         </tbody>
       </table>
       {items.length === 0 && <p>No expense items found.</p>}
-      
+
       <Modal show={showCommentModal} onHide={() => setShowCommentModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Comment</Modal.Title>
