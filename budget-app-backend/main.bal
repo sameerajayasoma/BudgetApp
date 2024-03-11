@@ -12,7 +12,7 @@ type ExpenseItemWithoutId record {|
     decimal amount;
     string date;
     string categoryId;
-    string comment;
+    string? comment;
 |};
 
 @http:ServiceConfig {

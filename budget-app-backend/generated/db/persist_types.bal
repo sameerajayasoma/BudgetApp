@@ -8,7 +8,7 @@ public type ExpenseItem record {|
     string description;
     decimal amount;
     string date;
-    string comment;
+    string? comment;
     string categoryId;
 |};
 
@@ -17,7 +17,7 @@ public type ExpenseItemOptionalized record {|
     string description?;
     decimal amount?;
     string date?;
-    string comment?;
+    string? comment?;
     string categoryId?;
 |};
 
@@ -34,7 +34,7 @@ public type ExpenseItemUpdate record {|
     string description?;
     decimal amount?;
     string date?;
-    string comment?;
+    string? comment?;
     string categoryId?;
 |};
 
