@@ -158,11 +158,18 @@ const App: React.FC = () => {
           <button className="btn btn-outline-danger my-2 my-sm-0" type="submit" onClick={handleLogout}>Logout</button>
         </div>
       </nav>
-      <h1>Expense Tracker</h1>
-      {!isLoading && <button className="btn btn-primary m-1" onClick={handleAddNew}>Add New Expense</button>}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2>Expense Items</h2>
+        {!isLoading && (
+          <button className="btn btn-primary" onClick={handleAddNew}>
+            Add New Expense
+          </button>
+        )}
+      </div>
       {editingItem && <ExpenseItemForm onSave={handleSaveExpenseItem} itemToEdit={editingItem} />}
       <ExpenseItemsList items={expenseItems} onDelete={handleDeleteExpenseItem} onEdit={handleEditExpenseItem} isLoading={isLoading} />
     </div>
+
   );
 };
 

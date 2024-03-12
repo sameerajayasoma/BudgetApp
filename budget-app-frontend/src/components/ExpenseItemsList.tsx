@@ -55,7 +55,6 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
 
   return (
     <div>
-      <h2 className="mt-3">Expense Items</h2>
       <div className="d-none d-md-block"> {/* Table shown only on md screens and up */}
         <div className="table-responsive">
           <table className="table table-striped mt-3">
