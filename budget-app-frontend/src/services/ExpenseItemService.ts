@@ -36,7 +36,7 @@ export const updateExpenseItem = async (id: string, expenseItem: NewExpenseItem)
     description: expenseItem.description,
     amount: parseFloat(expenseItem.amount), 
     date: expenseItem.date, 
-    comment: expenseItem.comment,
+    comment: expenseItem.comment || "",
     categoryId: expenseItem.categoryId
   };
   const response = await axios.put<ExpenseItem>(`${API_URL}/${id}`, newExpenseItem);
