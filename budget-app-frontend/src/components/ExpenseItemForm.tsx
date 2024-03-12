@@ -32,12 +32,6 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
         }
     }, [itemToEdit]);
 
-
-    const handleChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setItem({ ...item, [name]: value });
-    };
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
 
@@ -102,7 +96,6 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
                     <label htmlFor="description">Description</label>
                     <input
                         type="text"
-                        // className="form-control"
                         className={`form-control ${errors.description ? 'is-invalid' : ''}`}
                         id="description"
                         name="description"
