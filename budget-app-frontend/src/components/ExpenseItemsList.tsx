@@ -100,6 +100,11 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
               </div>
               <div className="text-muted" style={{ fontSize: '0.875rem' }}>{new Date(item.date).toLocaleDateString()}</div>
               <div className="mb-2 text-muted" style={{ fontSize: '0.875rem' }}>{categoryMap.get(item.categoryId)?.name || 'No Category'}</div>
+              {expandedCommentId === item.id && (
+                  <div className="mt-2">
+                    <p className="card-text">{item.comment || 'No comment available'}</p>
+                  </div>
+                )}
               <div>
                 {/* <button className="btn btn-outline-info btn-sm" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>
                   Show Comment
@@ -113,12 +118,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
                 >
                   {expandedCommentId === item.id ? 'Hide Comment' : 'Show Comment'}
                 </button>
-
-                {expandedCommentId === item.id && (
-                  <div className="mt-2">
-                    <p className="card-text">{item.comment || 'No comment available'}</p>
-                  </div>
-                )}
+                
                 <button className="btn btn-outline-warning btn-sm m-1" onClick={() => onEdit(item)}>Edit</button>
                 <button className="btn btn-outline-danger btn-sm" onClick={() => onDelete(item.id)}>Delete</button>
                 {/* <button className="btn btn-warning btn-sm m-1" onClick={() => onEdit(item)}><i className="bi bi-pencil"></i></button> */}
