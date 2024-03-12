@@ -106,15 +106,34 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
                 </div>
               )}
               <div className="d-flex justify-content-between align-items-center">
-                <button
-                  className="btn btn-link"
-                  onClick={(e) => {
-                    e.preventDefault(); // Prevent default if using <a>
-                    setExpandedCommentId(expandedCommentId === item.id ? null : item.id);
-                  }}
-                >
-                  {expandedCommentId === item.id ? 'Hide Comment' : 'Show Comment'}
-                </button>
+                {/* <div>
+                  {item.comment?.trim() && (
+                    <button
+                      className="btn btn-link"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setExpandedCommentId(expandedCommentId === item.id ? null : item.id);
+                      }}
+                    >
+                      {expandedCommentId === item.id ? 'Hide Comment' : 'Show Comment'}
+                    </button>
+                  )}
+                </div> */}
+                <div>
+                  {item.comment?.trim() && (
+                    <a
+                      href="#!"
+                      className="text-primary"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setExpandedCommentId(expandedCommentId === item.id ? null : item.id);
+                      }}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      {expandedCommentId === item.id ? 'Hide Comment' : 'Show Comment'}
+                    </a>
+                  )}
+                </div>
                 <div>
                   <button className="btn btn-outline-warning btn-sm m-1" onClick={() => onEdit(item)}>Edit</button>
                   <button className="btn btn-outline-danger btn-sm" onClick={() => onDelete(item.id)}>Delete</button>
