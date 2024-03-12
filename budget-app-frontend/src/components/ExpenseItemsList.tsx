@@ -103,8 +103,10 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
                 <button className="btn btn-outline-info btn-sm" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>
                   Show Comment
                 </button>
-                <button className="btn btn-outline-warning btn-sm m-1" onClick={() => onEdit(item)}>Edit</button>
-                <button className="btn btn-outline-danger btn-sm" onClick={() => onDelete(item.id)}>Delete</button>
+                {/* <button className="btn btn-outline-warning btn-sm m-1" onClick={() => onEdit(item)}>Edit</button> */}
+                {/* <button className="btn btn-outline-danger btn-sm" onClick={() => onDelete(item.id)}>Delete</button> */}
+                <button className="btn btn-warning btn-sm m-1" onClick={() => onEdit(item)}><i className="bi bi-pencil"></i></button>
+                <button className="btn btn-danger btn-sm" onClick={() => onDelete(item.id)}><i className="bi bi-trash"></i></button>
               </div>
             </div>
           </div>
