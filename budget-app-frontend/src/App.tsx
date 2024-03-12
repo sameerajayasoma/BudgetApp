@@ -156,7 +156,7 @@ const App: React.FC = () => {
 
   return (
     <div className="container mt-5">
-      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+      <ToastContainer position="top-right"/>
       <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
         <div className="container-fluid">
           <a className="navbar-brand" href="#">BudgetApp</a>

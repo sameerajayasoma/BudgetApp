@@ -97,7 +97,6 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
 
     return (
         <div>
-            <ToastContainer />
             <form onSubmit={handleSubmit} className="mt-4">
                 <div className="form-group">
                     <label htmlFor="description">Description</label>
