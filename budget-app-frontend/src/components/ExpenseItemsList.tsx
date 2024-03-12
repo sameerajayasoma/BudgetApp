@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ExpenseItem } from '../types/ExpenseItem';
-import { NewExpenseItem } from '../types/NewExpenseItem';
 import { ExpenseCategory } from '../types/ExpenseCategory';
 import { fetchExpenseCategories } from '../services/ExpenseCategoryService';
 import Modal from 'react-bootstrap/Modal';

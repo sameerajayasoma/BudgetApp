@@ -101,10 +101,6 @@ const App: React.FC = () => {
     window.location.href = `/auth/logout?session_hint=${sessionHint}`;
   };
 
-  // if (isAuthLoading) {
-  //   return <div>Loading authentication status...</div>;
-  // }
-
   if (isAuthLoading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
@@ -115,30 +111,30 @@ const App: React.FC = () => {
     );
   }
 
-  // if (!signedIn) {
-  //   return (
-  //     <div className="container d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
-  //       <div className="card shadow-lg" style={{ width: "400px" }}>
-  //         <div className="card-body">
-  //           <h2 className="card-title text-center">BudgetApp Login</h2>
-  //           <p className="text-center">Welcome back! Please login to your account.</p>
-  //           <div className="d-grid gap-2">
-  //             <button
-  //               className="btn btn-primary btn-lg"
-  //               onClick={() => { window.location.href = "/auth/login"; }}
-  //             >
-  //               Sign in
-  //             </button>
-  //             {/* Optionally, add more OAuth provider buttons here */}
-  //           </div>
-  //         </div>
-  //         <div className="card-footer text-muted text-center">
-  //           Need an account? <a href="/signup">Sign up</a>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  if (!signedIn) {
+    return (
+      <div className="container d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+        <div className="card shadow-lg" style={{ width: "400px" }}>
+          <div className="card-body">
+            <h2 className="card-title text-center">BudgetApp Login</h2>
+            <p className="text-center">Welcome back! Please login to your account.</p>
+            <div className="d-grid gap-2">
+              <button
+                className="btn btn-primary btn-lg"
+                onClick={() => { window.location.href = "/auth/login"; }}
+              >
+                Sign in
+              </button>
+              {/* Optionally, add more OAuth provider buttons here */}
+            </div>
+          </div>
+          <div className="card-footer text-muted text-center">
+            Need an account? <a href="/signup">Sign up</a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mt-5">
