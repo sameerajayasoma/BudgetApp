@@ -101,7 +101,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
               <div className="text-muted" style={{ fontSize: '0.875rem' }}>{new Date(item.date).toLocaleDateString()}</div>
               <div className="mb-2 text-muted" style={{ fontSize: '0.875rem' }}>{categoryMap.get(item.categoryId)?.name || 'No Category'}</div>
               {expandedCommentId === item.id && (
-                <div className="comment-section mt-3 p-2" style={{ background: '#f8f9fa', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,.05)' }}>
+                <div className="comment-section mt-3 p-2 m-1" style={{ background: '#f8f9fa', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,.05)' }}>
                   <p className="m-0" style={{ whiteSpace: 'pre-line' }}>{item.comment}</p>
                 </div>
               )}
