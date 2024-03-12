@@ -76,7 +76,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
                   <td>{item.date}</td>
                   <td>{categoryMap.get(item.categoryId)?.name || 'No Category'}</td>
                   <td>
-                    <button className="btn btn--outline-info btn-sm m-1" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>Show Comment</button>
+                    <button className="btn btn-outline-info" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>Show Comment</button>
                   </td>
                   <td>
                     <button className="btn btn-outline-warning m-1" onClick={() => onEdit(item)}>Edit</button>
@@ -97,7 +97,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
               <p className="card-text">Amount: {item.amount.toFixed(2)}</p>
               <p className="card-text">Date: {item.date}</p>
               <p className="card-text">Category: {categoryMap.get(item.categoryId)?.name || 'No Category'}</p>
-              <button className="btn btn-outline-info btn-sm mb-2" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>
+              <button className="btn btn-outline-info" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>
                 Show Comment
               </button>
               <div>
