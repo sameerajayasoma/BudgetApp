@@ -101,24 +101,11 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
               <div className="text-muted" style={{ fontSize: '0.875rem' }}>{new Date(item.date).toLocaleDateString()}</div>
               <div className="mb-2 text-muted" style={{ fontSize: '0.875rem' }}>{categoryMap.get(item.categoryId)?.name || 'No Category'}</div>
               {expandedCommentId === item.id && (
-                <div className="mt-2">
-                  <p className="card-text">{item.comment || 'No comment available'}</p>
+                <div className="comment-section mt-3 p-2" style={{ background: '#f8f9fa', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,.05)' }}>
+                  <p className="m-0" style={{ whiteSpace: 'pre-line' }}>{item.comment}</p>
                 </div>
               )}
               <div className="d-flex justify-content-between align-items-center">
-                {/* <div>
-                  {item.comment?.trim() && (
-                    <button
-                      className="btn btn-link"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setExpandedCommentId(expandedCommentId === item.id ? null : item.id);
-                      }}
-                    >
-                      {expandedCommentId === item.id ? 'Hide Comment' : 'Show Comment'}
-                    </button>
-                  )}
-                </div> */}
                 <div>
                   {item.comment?.trim() && (
                     <a
