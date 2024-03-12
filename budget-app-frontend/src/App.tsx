@@ -115,61 +115,49 @@ const App: React.FC = () => {
     );
   }
 
-  if (!signedIn) {
-    return (
-      <div className="container d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
-        <div className="card shadow-lg" style={{ width: "400px" }}>
-          <div className="card-body">
-            <h2 className="card-title text-center">BudgetApp Login</h2>
-            <p className="text-center">Welcome back! Please login to your account.</p>
-            <div className="d-grid gap-2">
-              <button
-                className="btn btn-primary btn-lg"
-                onClick={() => { window.location.href = "/auth/login"; }}
-              >
-                Sign in
-              </button>
-              {/* Optionally, add more OAuth provider buttons here */}
-            </div>
-          </div>
-          <div className="card-footer text-muted text-center">
-            Need an account? <a href="/signup">Sign up</a>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // return (
-  //   <div className="container mt-5">
-  //     <h1>Expense Tracker</h1>
-  //     <button className="btn btn-primary m-1" onClick={handleAddNew}>Add New Expense</button>
-  //     <button className="btn btn-danger pull-right" onClick={handleLogout}>Logout</button>
-  //     {editingItem && <ExpenseItemForm onSave={handleSaveExpenseItem} itemToEdit={editingItem} />}
-  //     <ExpenseItemsList items={expenseItems} onDelete={handleDeleteExpenseItem} onEdit={handleEditExpenseItem} isLoading={isLoading} />
-  //   </div>
-  // );
+  // if (!signedIn) {
+  //   return (
+  //     <div className="container d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+  //       <div className="card shadow-lg" style={{ width: "400px" }}>
+  //         <div className="card-body">
+  //           <h2 className="card-title text-center">BudgetApp Login</h2>
+  //           <p className="text-center">Welcome back! Please login to your account.</p>
+  //           <div className="d-grid gap-2">
+  //             <button
+  //               className="btn btn-primary btn-lg"
+  //               onClick={() => { window.location.href = "/auth/login"; }}
+  //             >
+  //               Sign in
+  //             </button>
+  //             {/* Optionally, add more OAuth provider buttons here */}
+  //           </div>
+  //         </div>
+  //         <div className="card-footer text-muted text-center">
+  //           Need an account? <a href="/signup">Sign up</a>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="container mt-5">
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
         <div className="container-fluid">
           <a className="navbar-brand" href="#">BudgetApp</a>
-          <button className="btn btn-outline-danger my-2 my-sm-0" type="submit" onClick={handleLogout}>Logout</button>
+          <div className="d-flex align-items-center">
+            {!isLoading && (
+              <button className="btn btn-outline-primary mr-2" onClick={handleAddNew} style={{ marginRight: '10px' }}>
+                Add New Expense
+              </button>
+            )}
+            <button className="btn btn-outline-danger" onClick={handleLogout}>Logout</button>
+          </div>
         </div>
       </nav>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Expense Items</h2>
-        {!isLoading && (
-          <button className="btn btn-primary" onClick={handleAddNew}>
-            Add New Expense
-          </button>
-        )}
-      </div>
       {editingItem && <ExpenseItemForm onSave={handleSaveExpenseItem} itemToEdit={editingItem} />}
       <ExpenseItemsList items={expenseItems} onDelete={handleDeleteExpenseItem} onEdit={handleEditExpenseItem} isLoading={isLoading} />
     </div>
-
   );
 };
 

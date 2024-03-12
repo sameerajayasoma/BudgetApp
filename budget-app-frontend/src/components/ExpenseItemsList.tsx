@@ -55,6 +55,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
 
   return (
     <div>
+      <h2>Expense Items</h2>
       <div className="d-none d-md-block"> {/* Table shown only on md screens and up */}
         <div className="table-responsive">
           <table className="table table-striped mt-3">
@@ -76,11 +77,11 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
                   <td>{item.date}</td>
                   <td>{categoryMap.get(item.categoryId)?.name || 'No Category'}</td>
                   <td>
-                    <button className="btn btn-info btn-sm m-1" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>Show Comment</button>
+                    <button className="btn btn--outline-info btn-sm m-1" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>Show Comment</button>
                   </td>
                   <td>
-                    <button className="btn btn-warning m-1" onClick={() => onEdit(item)}>Edit</button>
-                    <button className="btn btn-danger" onClick={() => onDelete(item.id)}>Delete</button>
+                    <button className="btn btn-outline-warning m-1" onClick={() => onEdit(item)}>Edit</button>
+                    <button className="btn btn-outline-danger" onClick={() => onDelete(item.id)}>Delete</button>
                   </td>
                 </tr>
               ))}
@@ -97,12 +98,12 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
               <p className="card-text">Amount: {item.amount.toFixed(2)}</p>
               <p className="card-text">Date: {item.date}</p>
               <p className="card-text">Category: {categoryMap.get(item.categoryId)?.name || 'No Category'}</p>
-              <button className="btn btn-info btn-sm mb-2" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>
+              <button className="btn btn-outline-info btn-sm mb-2" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>
                 Show Comment
               </button>
               <div>
-                <button className="btn btn-warning m-1" onClick={() => onEdit(item)}>Edit</button>
-                <button className="btn btn-danger" onClick={() => onDelete(item.id)}>Delete</button>
+                <button className="btn btn-outline-warning m-1" onClick={() => onEdit(item)}>Edit</button>
+                <button className="btn btn-outline-danger" onClick={() => onDelete(item.id)}>Delete</button>
               </div>
             </div>
           </div>
