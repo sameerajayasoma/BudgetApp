@@ -91,23 +91,26 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
       </div>
       <div className="d-md-none"> {/* Cards shown on screens smaller than md */}
         {items.map((item, index) => (
-          <div key={item.id} className={`card mb-3 ${bgClasses[index % bgClasses.length]} text-dark`}>
+          <div key={item.id} className="card mb-3 shadow-sm">
             <div className="card-body">
-              <h5 className="card-title">{item.description}</h5>
-              <p className="card-text">Amount: {item.amount.toFixed(2)}</p>
-              <p className="card-text">Date: {item.date}</p>
-              <p className="card-text">Category: {categoryMap.get(item.categoryId)?.name || 'No Category'}</p>
-              <button className="btn btn-outline-info" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>
-                Show Comment
-              </button>
-              <div>
-                <button className="btn btn-outline-warning m-1" onClick={() => onEdit(item)}>Edit</button>
-                <button className="btn btn-outline-danger" onClick={() => onDelete(item.id)}>Delete</button>
+              <h5 className="card-title" style={{ color: '#007bff' }}>{item.description}</h5>
+              <h6 className="card-subtitle mb-2 text-muted">Category: {categoryMap.get(item.categoryId)?.name || 'No Category'}</h6>
+              <p className="card-text" style={{ fontSize: '18px', fontWeight: 'bold' }}>Amount: ${item.amount.toFixed(2)}</p>
+              <p className="card-text"><small className="text-muted">Date: {item.date}</small></p>
+              <div className="d-flex justify-content-between align-items-center mt-2">
+                <button className="btn btn-outline-info btn-sm" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>
+                  Show Comment
+                </button>
+                <div>
+                  <button className="btn btn-outline-warning btn-sm m-1" onClick={() => onEdit(item)}>Edit</button>
+                  <button className="btn btn-outline-danger btn-sm" onClick={() => onDelete(item.id)}>Delete</button>
+                </div>
               </div>
             </div>
           </div>
         ))}
       </div>
+
       <Modal show={showCommentModal} onHide={() => setShowCommentModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Comment</Modal.Title>
