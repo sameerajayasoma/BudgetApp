@@ -6,6 +6,8 @@ import ExpenseItemsList from './components/ExpenseItemsList';
 import ExpenseItemForm from './components/ExpenseItemForm';
 import Cookies from 'js-cookie';
 import { Spinner } from 'react-bootstrap';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App: React.FC = () => {
   const [expenseItems, setExpenseItems] = useState<ExpenseItem[]>([]);
@@ -48,28 +50,29 @@ const App: React.FC = () => {
         const items = await fetchExpenseItems();
         setExpenseItems(items);
       } catch (error) {
-        console.error("Failed to fetch expense items:", error);
-        // Handle error (e.g., set an error state here)
+        toast.error("Failed to load expense items. Please try again later.");
       } finally {
         setIsLoading(false); // End loading
       }
-      // const items = await fetchExpenseItems();
-      // setExpenseItems(items);
     } else {
       setExpenseItems([]); // Clear the items if not signed in
     }
   };
 
   const handleSaveExpenseItem = async (item: NewExpenseItem) => {
-    // Validate the item
-
-    if (item.id) {
-      await updateExpenseItem(item.id, item);
-    } else {
-      await createExpenseItem(item);
+    try {
+      if (item.id) {
+        await updateExpenseItem(item.id, item);
+        toast.success("Expense item updated successfully.");
+      } else {
+        await createExpenseItem(item);
+        toast.success("Expense item created successfully.");
+      }
+      loadExpenseItems();
+      setEditingItem(null);
+    } catch (error) {
+      toast.error("Failed to save the expense item. Please try again.");
     }
-    loadExpenseItems();
-    setEditingItem(null); // Reset editing item after saving
   };
 
   const handleEditExpenseItem = (item: ExpenseItem) => {
@@ -78,8 +81,23 @@ const App: React.FC = () => {
   };
 
   const handleDeleteExpenseItem = async (id: string) => {
-    await deleteExpenseItem(id);
-    loadExpenseItems();
+    // Confirm with the user before deletion
+    const isConfirmed = window.confirm("Are you sure you want to delete this expense item?");
+    
+    if (!isConfirmed) {
+      return; // Early return if the user cancels the operation
+    }
+  
+    try {
+      await deleteExpenseItem(id);
+      toast.success("Expense item deleted successfully.");
+      loadExpenseItems(); // Reload the list to reflect the changes
+    } catch (error) {
+      // Log the error or handle it as appropriate
+      console.error("Failed to delete expense item:", error);
+      // Notify the user of the failure
+      toast.error("Failed to delete the expense item. Please try again later.");
+    }
   };
 
   const handleAddNew = () => {
@@ -138,6 +156,7 @@ const App: React.FC = () => {
 
   return (
     <div className="container mt-5">
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
       <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
         <div className="container-fluid">
           <a className="navbar-brand" href="#">BudgetApp</a>

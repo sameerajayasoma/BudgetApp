@@ -20,7 +20,6 @@ export const fetchExpenseCategories = async (): Promise<ExpenseCategory[]> => {
     return response.data;
   } catch (error) {
     console.error('Failed to fetch expense categories:', error);
-    // Handle or throw error appropriately
     throw error;
   }
 };

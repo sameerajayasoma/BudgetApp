@@ -26,8 +26,14 @@ export const createExpenseItem = async (expenseItem: NewExpenseItem): Promise<Ex
     comment: expenseItem.comment,
     categoryId: expenseItem.categoryId
   };
-  const response = await axios.post<ExpenseItem>(API_URL, newExpenseItem);
-  return response.data;
+
+  try {
+    const response = await axios.post<ExpenseItem>(API_URL, newExpenseItem);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to create expense item:', error);
+    throw error;
+  }
 };
 
 export const updateExpenseItem = async (id: string, expenseItem: NewExpenseItem): Promise<ExpenseItem> => {
@@ -39,10 +45,21 @@ export const updateExpenseItem = async (id: string, expenseItem: NewExpenseItem)
     comment: expenseItem.comment || "", // TODO This seems like a bug in the API
     categoryId: expenseItem.categoryId
   };
-  const response = await axios.put<ExpenseItem>(`${API_URL}/${id}`, newExpenseItem);
-  return response.data;
+
+  try {
+    const response = await axios.put<ExpenseItem>(`${API_URL}/${id}`, newExpenseItem);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to update expense item:', error);
+    throw error;
+  }
 };
 
 export const deleteExpenseItem = async (id: string): Promise<void> => {
-  await axios.delete(`${API_URL}/${id}`);
+  try {
+    await axios.delete(`${API_URL}/${id}`);
+  } catch (error) {
+    console.error('Failed to delete expense item:', error);
+    throw error;
+  } 
 };
