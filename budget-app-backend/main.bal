@@ -106,5 +106,9 @@ service /budgetapp on new http:Listener(8081) {
             return expenseCategories;
         }
     }
+
+    resource function get health/readiness() returns http:Ok|http:InternalServerError {
+        return http:OK;
+    }
 }
 
