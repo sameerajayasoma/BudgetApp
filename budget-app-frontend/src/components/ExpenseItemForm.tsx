@@ -13,13 +13,13 @@ interface ExpenseItemFormProps {
 const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit }) => {
     const [item, setItem] = useState<NewExpenseItem>({
         id: '',
-        description: '', amount: '', date: '', categoryId: ''
+        description: '', amount: '', dateTime: '', categoryId: ''
     });
     const [categories, setCategories] = useState<ExpenseCategory[]>([]);
     const [errors, setErrors] = useState({
         description: '',
         amount: '',
-        date: '',
+        dateTime: '',
         comment: '',
         categoryId: '',
     });
@@ -54,8 +54,8 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
             }
         } else if (name === 'description' && !value.trim()) {
             newErrors[name] = 'Description is required.';
-        } else if (name === 'date' && !value) {
-            newErrors[name] = 'Date is required.';
+        } else if (name === 'dateTime' && !value) {
+            newErrors[name] = 'DateTime is required.';
         } else if (name === 'categoryId' && !value) {
             newErrors[name] = 'Category is required.';
         }
@@ -74,19 +74,19 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
             return;
         }
 
-        if (!item.description || !item.amount || !item.date || !item.categoryId) {
+        if (!item.description || !item.amount || !item.dateTime || !item.categoryId) {
             toast.error("Please fill in all fields before submitting.");
             return;
         }
 
         onSave(item);
         // Reset form to initial state
-        setItem({ id: '', description: '', amount: '', date: '', categoryId: '' });
+        setItem({ id: '', description: '', amount: '', dateTime: '', categoryId: '' });
     };
 
     const handleReset = () => {
         // Reset the item state to initial form values
-        setItem({ id: '', description: '', amount: '', date: '', categoryId: '' });
+        setItem({ id: '', description: '', amount: '', dateTime: '', categoryId: '' });
     };
 
     return (
@@ -129,16 +129,17 @@ const ExpenseItemForm: React.FC<ExpenseItemFormProps> = ({ onSave, itemToEdit })
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="date">Date</label>
+                    <label htmlFor="dateTime">Date and Time</label>
                     <input
-                        type="date"
-                        className={`form-control ${errors.date ? 'is-invalid' : ''}`}
-                        id="date"
-                        name="date"
-                        value={item.date}
+                        type="datetime-local"
+                        className={`form-control ${errors.dateTime ? 'is-invalid' : ''}`}
+                        id="dateTime"
+                        name="dateTime"
+                        value={item.dateTime} // Ensure this is in the 'YYYY-MM-DDThh:mm' format
                         onChange={handleChange}
+                        step="1" // Optional: allows users to select time to the second
                     />
-                    {errors.date && <div className="invalid-feedback">{errors.date}</div>}
+                    {errors.dateTime && <div className="invalid-feedback">{errors.dateTime}</div>}
                 </div>
                 <div className="form-group">
                     <label htmlFor="category">Category</label>

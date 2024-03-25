@@ -74,7 +74,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
                 <tr key={item.id}>
                   <td>{item.description}</td>
                   <td>{item.amount.toFixed(2)}</td>
-                  <td>{item.date}</td>
+                  <td>{new Date(item.dateTime).toLocaleDateString()}</td>
                   <td>{categoryMap.get(item.categoryId)?.name || 'No Category'}</td>
                   <td>
                     <button className="btn btn-outline-info" onClick={() => handleShowCommentClick(item.comment || 'No comment available')}>Show Comment</button>
@@ -98,7 +98,7 @@ const ExpenseItemsList: React.FC<ExpenseItemsListProps> = ({ items, onDelete, on
                 <h5 className="card-title mb-0">{item.description}</h5>
                 <span className="text-muted" style={{ fontSize: '1.25rem' }}>${item.amount.toFixed(2)}</span>
               </div>
-              <div className="text-muted" style={{ fontSize: '0.875rem' }}>{new Date(item.date).toLocaleDateString()}</div>
+              <div className="text-muted" style={{ fontSize: '0.875rem' }}>{new Date(item.dateTime).toLocaleDateString()}</div>
               <div className="mb-2 text-muted" style={{ fontSize: '0.875rem' }}>{categoryMap.get(item.categoryId)?.name || 'No Category'}</div>
               {expandedCommentId === item.id && (
                 <div className="comment-section mt-3 p-2 m-1" style={{ background: '#f8f9fa', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,.05)' }}>

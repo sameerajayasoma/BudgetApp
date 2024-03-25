@@ -4,7 +4,7 @@ export interface NewExpenseItem {
   id: string;
   description: string;
   amount: string;
-  date: string;
+  dateTime: string;
   comment?: string;
   categoryId: string;
   category?: ExpenseCategory;

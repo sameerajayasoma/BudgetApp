@@ -76,18 +76,20 @@ const App: React.FC = () => {
   };
 
   const handleEditExpenseItem = (item: ExpenseItem) => {
-    let expenseItem: NewExpenseItem = { amount: item.amount.toString(), categoryId: item.categoryId, date: item.date, description: item.description, id: item.id };
+    const expenseDate = new Date(item.dateTime);
+    const expenseDateInFormat = toLocalDateTimeString(expenseDate);
+    let expenseItem: NewExpenseItem = { amount: item.amount.toString(), categoryId: item.categoryId, dateTime: expenseDateInFormat, description: item.description, id: item.id };
     setEditingItem(expenseItem);
   };
 
   const handleDeleteExpenseItem = async (id: string) => {
     // Confirm with the user before deletion
     const isConfirmed = window.confirm("Are you sure you want to delete this expense item?");
-    
+
     if (!isConfirmed) {
       return; // Early return if the user cancels the operation
     }
-  
+
     try {
       await deleteExpenseItem(id);
       toast.success("Expense item deleted successfully.");
@@ -100,8 +102,17 @@ const App: React.FC = () => {
     }
   };
 
+  function toLocalDateTimeString(date: Date): string {
+    const offset: number = date.getTimezoneOffset() * 60000; // Convert offset to milliseconds
+    const localISOTime: string = (new Date(date.getTime() - offset)).toISOString().slice(0, -1);
+    return localISOTime.substring(0, localISOTime.lastIndexOf(":"));
+  }
+
+
   const handleAddNew = () => {
-    setEditingItem({ id: '', description: '', amount: '', date: '', categoryId: '' }); // Reset form for new entry
+    const now = new Date();
+    const defaultDateTime = toLocalDateTimeString(now);
+    setEditingItem({ id: '', description: '', amount: '', dateTime: defaultDateTime, categoryId: '' }); // Reset form for new entry
   };
 
   const handleLogout = async () => {
@@ -156,7 +167,7 @@ const App: React.FC = () => {
 
   return (
     <div className="container mt-5">
-      <ToastContainer position="top-right"/>
+      <ToastContainer position="top-right" />
       <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
         <div className="container-fluid">
           <a className="navbar-brand" href="#">BudgetApp</a>
