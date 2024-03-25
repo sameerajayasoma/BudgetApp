@@ -36,37 +36,39 @@ public type ExpenseItem record {|
 service /budgetapp on new http:Listener(8081) {
 
     resource function get expenses() returns ExpenseItem[]|http:InternalServerError {
-        // A native SQL query to retrieve the list of expense items
-        // Bal persist does not support ordering by a datetime typed column yet
-        stream<db:ExpenseItem, error?> dbExpenseItemStream = budgetAppDb->queryNativeSQL(`SELECT * FROM ExpenseItem ORDER BY dateTime DESC`);
-        // db:ExpenseItem[]|error dbExpenseItems = from var expense in budgetAppDb->/expenseitems(targetType = db:ExpenseItem)
-        //     order by expense.date descending
-        //     select expense;
-        db:ExpenseItem[]|error dbExpenseItems = from var expense in dbExpenseItemStream
-            select expense;
-        if dbExpenseItems is error {
-            log:printError("Error occurred while retrieving the list of expense items.", 'error = dbExpenseItems);
-            return http:INTERNAL_SERVER_ERROR;
-        } else {
+        do {
+            // A native SQL query to retrieve the list of expense items
+            // Bal persist does not support ordering by a datetime typed column yet
+            stream<db:ExpenseItem, error?> dbExpenseItemStream = budgetAppDb->queryNativeSQL(`SELECT * FROM ExpenseItem ORDER BY dateTime DESC`);
+            // db:ExpenseItem[]|error dbExpenseItems = from var expense in budgetAppDb->/expenseitems(targetType = db:ExpenseItem)
+            //     order by expense.date descending
+            //     select expense;
+            db:ExpenseItem[] dbExpenseItems = check from var expense in dbExpenseItemStream
+                select expense;
             return from var item in dbExpenseItems
-                select toExpenseItem(item);
+                select check toExpenseItem(item);
+        } on fail var e {
+            log:printError("Error occurred while retrieving the list of expense items.", 'error = e);
+            return http:INTERNAL_SERVER_ERROR;
         }
     }
 
     resource function get expenses/[string id]() returns ExpenseItem|http:NotFound|http:InternalServerError {
-        db:ExpenseItem|persist:Error dbExpenseItem = budgetAppDb->/expenseitems/[id]();
-        if dbExpenseItem is persist:NotFoundError {
-            return http:NOT_FOUND;
-        } else if dbExpenseItem is persist:Error {
-            log:printError("Error occurred while retrieving the expense item.", expenseItemId = id, 'error = dbExpenseItem);
-            return http:INTERNAL_SERVER_ERROR;
-        } else {
-            return toExpenseItem(dbExpenseItem);
+        do {
+            db:ExpenseItem dbExpenseItem = check budgetAppDb->/expenseitems/[id]();
+            return check toExpenseItem(dbExpenseItem);
+        } on fail var e {
+            if e is persist:NotFoundError {
+                return http:NOT_FOUND;
+            } else if e is error {
+                log:printError("Error occurred while retrieving the expense item.", expenseItemId = id, 'error = e);
+                return http:INTERNAL_SERVER_ERROR;
+            }
         }
     }
 
     resource function post expenses(ExpenseItemWithoutId newExpenseItem) returns db:ExpenseItem|http:BadRequest|http:InternalServerError {
-        time:Utc|error  utcTime = time:utcFromString(newExpenseItem.dateTime);
+        time:Utc|error utcTime = time:utcFromString(newExpenseItem.dateTime);
         if utcTime is error {
             log:printError("Error occurred while parsing the date.", 'error = utcTime);
             return http:BAD_REQUEST;
@@ -77,7 +79,6 @@ service /budgetapp on new http:Listener(8081) {
             id: uuid:createType4AsString(),
             description: newExpenseItem.description,
             amount: newExpenseItem.amount,
-            date: newExpenseItem.dateTime,
             categoryId: newExpenseItem.categoryId,
             comment: newExpenseItem.comment,
             dateTime: dateTime,
@@ -94,7 +95,7 @@ service /budgetapp on new http:Listener(8081) {
     }
 
     resource function put expenses/[string id](ExpenseItem updatedExpenseItem) returns http:Ok|http:NotFound|http:BadRequest|http:InternalServerError {
-        time:Utc|error  utcTime = time:utcFromString(updatedExpenseItem.dateTime);
+        time:Utc|error utcTime = time:utcFromString(updatedExpenseItem.dateTime);
         if utcTime is error {
             log:printError("Error occurred while parsing the date.", 'error = utcTime);
             return http:BAD_REQUEST;
@@ -104,7 +105,6 @@ service /budgetapp on new http:Listener(8081) {
         db:ExpenseItemUpdate expenseItemUpdate = {
             description: updatedExpenseItem.description,
             amount: updatedExpenseItem.amount,
-            date: updatedExpenseItem.dateTime,
             dateTime: dateTime,
             categoryId: updatedExpenseItem.categoryId,
             comment: updatedExpenseItem.comment,
@@ -149,21 +149,17 @@ service /budgetapp on new http:Listener(8081) {
     }
 }
 
-isolated function toExpenseItem(db:ExpenseItem expenseItem) returns ExpenseItem =>
+isolated function toExpenseItem(db:ExpenseItem expenseItem) returns ExpenseItem|error =>
 {
     id: expenseItem.id,
     description: expenseItem.description,
     amount: expenseItem.amount,
-    dateTime: civilToRFC3339(expenseItem.dateTime) ?: expenseItem.date,
+    dateTime: check civilToRFC3339(expenseItem.dateTime),
     categoryId: expenseItem.categoryId,
     comment: expenseItem.comment
 };
 
-isolated function civilToRFC3339(time:Civil? dateTime) returns string? {
-    if dateTime is () {
-        return ();
-    }
-
+isolated function civilToRFC3339(time:Civil dateTime) returns string|error {
     dateTime.utcOffset = time:Z;
     string|error rfc3339 = time:civilToString(dateTime);
     if rfc3339 is error {

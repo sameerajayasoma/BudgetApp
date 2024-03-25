@@ -7,11 +7,10 @@ public type ExpenseItem record {|
     readonly string id;
     string description;
     decimal amount;
-    string date;
-    time:Civil? dateTime;
+    time:Civil dateTime;
     string? comment;
-    time:Utc? createdAt;
-    time:Utc? updatedAt;
+    time:Utc createdAt;
+    time:Utc updatedAt;
     string categoryId;
 |};
 
@@ -19,11 +18,10 @@ public type ExpenseItemOptionalized record {|
     string id?;
     string description?;
     decimal amount?;
-    string date?;
-    time:Civil? dateTime?;
+    time:Civil dateTime?;
     string? comment?;
-    time:Utc? createdAt?;
-    time:Utc? updatedAt?;
+    time:Utc createdAt?;
+    time:Utc updatedAt?;
     string categoryId?;
 |};
 
@@ -39,11 +37,10 @@ public type ExpenseItemInsert ExpenseItem;
 public type ExpenseItemUpdate record {|
     string description?;
     decimal amount?;
-    string date?;
-    time:Civil? dateTime?;
+    time:Civil dateTime?;
     string? comment?;
-    time:Utc? createdAt?;
-    time:Utc? updatedAt?;
+    time:Utc createdAt?;
+    time:Utc updatedAt?;
     string categoryId?;
 |};
 
