@@ -1,13 +1,16 @@
 import ballerina/persist as _;
+import ballerina/time;
 
 type ExpenseItem record {|
     readonly string id;
     string description;
     decimal amount;
     string date;
+    time:Civil? dateTime;
     string? comment;
+    time:Utc? createdAt;
+    time:Utc? updatedAt;
     ExpenseCategory category;
-    // User user;
 |};
 
 type ExpenseCategory record {|
@@ -25,9 +28,3 @@ type CategoryBudget record {|
     string year;
     string month;
 |};
-
-// type User record {|
-//     readonly string id;
-//     string email;
-// 	ExpenseItem[] expenseItems;
-// |};

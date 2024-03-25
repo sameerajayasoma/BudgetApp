@@ -1,14 +1,17 @@
 // AUTO-GENERATED FILE. DO NOT MODIFY.
-
 // This file is an auto-generated file by Ballerina persistence layer for model.
 // It should not be modified by hand.
+import ballerina/time;
 
 public type ExpenseItem record {|
     readonly string id;
     string description;
     decimal amount;
     string date;
+    time:Civil? dateTime;
     string? comment;
+    time:Utc? createdAt;
+    time:Utc? updatedAt;
     string categoryId;
 |};
 
@@ -17,7 +20,10 @@ public type ExpenseItemOptionalized record {|
     string description?;
     decimal amount?;
     string date?;
+    time:Civil? dateTime?;
     string? comment?;
+    time:Utc? createdAt?;
+    time:Utc? updatedAt?;
     string categoryId?;
 |};
 
@@ -34,7 +40,10 @@ public type ExpenseItemUpdate record {|
     string description?;
     decimal amount?;
     string date?;
+    time:Civil? dateTime?;
     string? comment?;
+    time:Utc? createdAt?;
+    time:Utc? updatedAt?;
     string categoryId?;
 |};
 

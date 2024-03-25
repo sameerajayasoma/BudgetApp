@@ -3,6 +3,7 @@ import budget_app_backend.db;
 import ballerina/http;
 import ballerina/log;
 import ballerina/persist;
+import ballerina/time;
 import ballerina/uuid;
 
 final db:Client budgetAppDb = check new ();
@@ -10,9 +11,20 @@ final db:Client budgetAppDb = check new ();
 type ExpenseItemWithoutId record {|
     string description;
     decimal amount;
-    string date;
+    // RFC 3336
+    string dateTime;
     string categoryId;
     string comment?;
+|};
+
+public type ExpenseItem record {|
+    readonly string id;
+    string description;
+    decimal amount;
+    // RFC 3336 format
+    string dateTime;
+    string? comment = ();
+    string categoryId;
 |};
 
 @http:ServiceConfig {
@@ -23,38 +35,54 @@ type ExpenseItemWithoutId record {|
 }
 service /budgetapp on new http:Listener(8081) {
 
-    resource function get expenses() returns db:ExpenseItem[]|http:InternalServerError {
-        db:ExpenseItem[]|error expenseItems = from var expense in budgetAppDb->/expenseitems(targetType = db:ExpenseItem)
-            order by expense.date descending
+    resource function get expenses() returns ExpenseItem[]|http:InternalServerError {
+        // A native SQL query to retrieve the list of expense items
+        // Bal persist does not support ordering by a datetime typed column yet
+        stream<db:ExpenseItem, error?> dbExpenseItemStream = budgetAppDb->queryNativeSQL(`SELECT * FROM ExpenseItem ORDER BY dateTime DESC`);
+        // db:ExpenseItem[]|error dbExpenseItems = from var expense in budgetAppDb->/expenseitems(targetType = db:ExpenseItem)
+        //     order by expense.date descending
+        //     select expense;
+        db:ExpenseItem[]|error dbExpenseItems = from var expense in dbExpenseItemStream
             select expense;
-        if expenseItems is error {
-            log:printError("Error occurred while retrieving the list of expense items.", 'error = expenseItems);
+        if dbExpenseItems is error {
+            log:printError("Error occurred while retrieving the list of expense items.", 'error = dbExpenseItems);
             return http:INTERNAL_SERVER_ERROR;
         } else {
-            return expenseItems;
+            return from var item in dbExpenseItems
+                select toExpenseItem(item);
         }
     }
 
-    resource function get expenses/[string id]() returns db:ExpenseItem|http:NotFound|http:InternalServerError {
-        db:ExpenseItem|persist:Error expenseItem = budgetAppDb->/expenseitems/[id]();
-        if expenseItem is persist:NotFoundError {
+    resource function get expenses/[string id]() returns ExpenseItem|http:NotFound|http:InternalServerError {
+        db:ExpenseItem|persist:Error dbExpenseItem = budgetAppDb->/expenseitems/[id]();
+        if dbExpenseItem is persist:NotFoundError {
             return http:NOT_FOUND;
-        } else if expenseItem is persist:Error {
-            log:printError("Error occurred while retrieving the expense item.", expenseItemId = id, 'error = expenseItem);
+        } else if dbExpenseItem is persist:Error {
+            log:printError("Error occurred while retrieving the expense item.", expenseItemId = id, 'error = dbExpenseItem);
             return http:INTERNAL_SERVER_ERROR;
         } else {
-            return expenseItem;
+            return toExpenseItem(dbExpenseItem);
         }
     }
 
-    resource function post expenses(ExpenseItemWithoutId newExpenseItem) returns db:ExpenseItem|http:InternalServerError {
+    resource function post expenses(ExpenseItemWithoutId newExpenseItem) returns db:ExpenseItem|http:BadRequest|http:InternalServerError {
+        time:Utc|error  utcTime = time:utcFromString(newExpenseItem.dateTime);
+        if utcTime is error {
+            log:printError("Error occurred while parsing the date.", 'error = utcTime);
+            return http:BAD_REQUEST;
+        }
+        time:Civil dateTime = time:utcToCivil(utcTime);
+
         db:ExpenseItem newExpenseItemRecord = {
             id: uuid:createType4AsString(),
             description: newExpenseItem.description,
             amount: newExpenseItem.amount,
-            date: newExpenseItem.date,
+            date: newExpenseItem.dateTime,
             categoryId: newExpenseItem.categoryId,
-            comment: newExpenseItem.comment
+            comment: newExpenseItem.comment,
+            dateTime: dateTime,
+            createdAt: time:utcNow(),
+            updatedAt: time:utcNow()
         };
         string[]|persist:Error insertedIds = budgetAppDb->/expenseitems.post([newExpenseItemRecord]);
         if insertedIds is string[] {
@@ -65,13 +93,22 @@ service /budgetapp on new http:Listener(8081) {
         }
     }
 
-    resource function put expenses/[string id](db:ExpenseItem updatedExpenseItem) returns http:Ok|http:NotFound|http:InternalServerError {
+    resource function put expenses/[string id](ExpenseItem updatedExpenseItem) returns http:Ok|http:NotFound|http:BadRequest|http:InternalServerError {
+        time:Utc|error  utcTime = time:utcFromString(updatedExpenseItem.dateTime);
+        if utcTime is error {
+            log:printError("Error occurred while parsing the date.", 'error = utcTime);
+            return http:BAD_REQUEST;
+        }
+        time:Civil dateTime = time:utcToCivil(utcTime);
+
         db:ExpenseItemUpdate expenseItemUpdate = {
             description: updatedExpenseItem.description,
             amount: updatedExpenseItem.amount,
-            date: updatedExpenseItem.date,
+            date: updatedExpenseItem.dateTime,
+            dateTime: dateTime,
             categoryId: updatedExpenseItem.categoryId,
-            comment: updatedExpenseItem.comment
+            comment: updatedExpenseItem.comment,
+            updatedAt: time:utcNow()
         };
         db:ExpenseItem|persist:Error updatedItem = budgetAppDb->/expenseitems/[id].put(expenseItemUpdate);
         if updatedItem is db:ExpenseItem {
@@ -110,5 +147,30 @@ service /budgetapp on new http:Listener(8081) {
     resource function get health/readiness() returns http:Ok|http:InternalServerError {
         return http:OK;
     }
+}
+
+isolated function toExpenseItem(db:ExpenseItem expenseItem) returns ExpenseItem =>
+{
+    id: expenseItem.id,
+    description: expenseItem.description,
+    amount: expenseItem.amount,
+    dateTime: civilToRFC3339(expenseItem.dateTime) ?: expenseItem.date,
+    categoryId: expenseItem.categoryId,
+    comment: expenseItem.comment
+};
+
+isolated function civilToRFC3339(time:Civil? dateTime) returns string? {
+    if dateTime is () {
+        return ();
+    }
+
+    dateTime.utcOffset = time:Z;
+    string|error rfc3339 = time:civilToString(dateTime);
+    if rfc3339 is error {
+        log:printError("Error occurred while converting the civil time to RFC 3339.", 'error = rfc3339);
+        return "1800-01-02T00:00:00Z";
+    }
+
+    return rfc3339;
 }
 

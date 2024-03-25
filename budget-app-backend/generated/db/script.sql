@@ -19,7 +19,10 @@ CREATE TABLE `ExpenseItem` (
 	`description` VARCHAR(191) NOT NULL,
 	`amount` DECIMAL(65,30) NOT NULL,
 	`date` VARCHAR(191) NOT NULL,
+	`dateTime` DATETIME,
 	`comment` VARCHAR(191),
+	`createdAt` TIMESTAMP,
+	`updatedAt` TIMESTAMP,
 	`categoryId` VARCHAR(191) NOT NULL,
 	FOREIGN KEY(`categoryId`) REFERENCES `ExpenseCategory`(`id`),
 	PRIMARY KEY(`id`)
