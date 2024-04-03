@@ -86,7 +86,7 @@ public isolated client class Client {
 
     public isolated function init(string host = "localhost", string? user = "root", string? password = (), string? database = (),
         int port = 3306, mysql:Options? options = (), sql:ConnectionPool? connectionPool = ()) returns persist:Error? {
-        mysql:Client|error dbClient = new (host = host, user = user, password = password, database = database, port = port, options = connectionOptions);
+        mysql:Client|error dbClient = new (host = host, user = user, password = password, database = database, port = port, options = options);
         if dbClient is error {
             return <persist:Error>error(dbClient.message());
         }
