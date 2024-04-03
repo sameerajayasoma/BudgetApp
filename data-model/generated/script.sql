@@ -4,6 +4,7 @@
 -- Please verify the generated scripts and execute them against the target DB server.
 
 DROP TABLE IF EXISTS `CategoryBudget`;
+DROP TABLE IF EXISTS `DailyExpenseSummary`;
 DROP TABLE IF EXISTS `ExpenseItem`;
 DROP TABLE IF EXISTS `ExpenseCategory`;
 
@@ -24,6 +25,15 @@ CREATE TABLE `ExpenseItem` (
 	`updatedAt` TIMESTAMP NOT NULL,
 	`categoryId` VARCHAR(191) NOT NULL,
 	FOREIGN KEY(`categoryId`) REFERENCES `ExpenseCategory`(`id`),
+	PRIMARY KEY(`id`)
+);
+
+CREATE TABLE `DailyExpenseSummary` (
+	`id` VARCHAR(191) NOT NULL,
+	`date` DATE NOT NULL,
+	`totalAmount` DECIMAL(65,30) NOT NULL,
+	`expensecategoryId` VARCHAR(191) NOT NULL,
+	FOREIGN KEY(`expensecategoryId`) REFERENCES `ExpenseCategory`(`id`),
 	PRIMARY KEY(`id`)
 );
 

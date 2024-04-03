@@ -11,6 +11,7 @@ import ballerinax/persist.sql as psql;
 const EXPENSE_ITEM = "expenseitems";
 const EXPENSE_CATEGORY = "expensecategories";
 const CATEGORY_BUDGET = "categorybudgets";
+const DAILY_EXPENSE_SUMMARY = "dailyexpensesummaries";
 
 public isolated client class Client {
     *persist:AbstractPersistClient;
@@ -58,12 +59,17 @@ public isolated client class Client {
                 "expenseItems[].comment": {relation: {entityName: "expenseItems", refField: "comment"}},
                 "expenseItems[].createdAt": {relation: {entityName: "expenseItems", refField: "createdAt"}},
                 "expenseItems[].updatedAt": {relation: {entityName: "expenseItems", refField: "updatedAt"}},
-                "expenseItems[].categoryId": {relation: {entityName: "expenseItems", refField: "categoryId"}}
+                "expenseItems[].categoryId": {relation: {entityName: "expenseItems", refField: "categoryId"}},
+                "dailyExpenseSummaryLines[].id": {relation: {entityName: "dailyExpenseSummaryLines", refField: "id"}},
+                "dailyExpenseSummaryLines[].date": {relation: {entityName: "dailyExpenseSummaryLines", refField: "date"}},
+                "dailyExpenseSummaryLines[].totalAmount": {relation: {entityName: "dailyExpenseSummaryLines", refField: "totalAmount"}},
+                "dailyExpenseSummaryLines[].expensecategoryId": {relation: {entityName: "dailyExpenseSummaryLines", refField: "expensecategoryId"}}
             },
             keyFields: ["id"],
             joinMetadata: {
                 categoryBudget: {entity: CategoryBudget, fieldName: "categoryBudget", refTable: "CategoryBudget", refColumns: ["categorybudgetId"], joinColumns: ["id"], 'type: psql:ONE_TO_ONE},
-                expenseItems: {entity: ExpenseItem, fieldName: "expenseItems", refTable: "ExpenseItem", refColumns: ["categoryId"], joinColumns: ["id"], 'type: psql:MANY_TO_ONE}
+                expenseItems: {entity: ExpenseItem, fieldName: "expenseItems", refTable: "ExpenseItem", refColumns: ["categoryId"], joinColumns: ["id"], 'type: psql:MANY_TO_ONE},
+                dailyExpenseSummaryLines: {entity: DailyExpenseSummary, fieldName: "dailyExpenseSummaryLines", refTable: "DailyExpenseSummary", refColumns: ["expensecategoryId"], joinColumns: ["id"], 'type: psql:MANY_TO_ONE}
             }
         },
         [CATEGORY_BUDGET] : {
@@ -81,11 +87,26 @@ public isolated client class Client {
             },
             keyFields: ["id"],
             joinMetadata: {category: {entity: ExpenseCategory, fieldName: "category", refTable: "ExpenseCategory", refColumns: ["id"], joinColumns: ["categorybudgetId"], 'type: psql:ONE_TO_ONE}}
+        },
+        [DAILY_EXPENSE_SUMMARY] : {
+            entityName: "DailyExpenseSummary",
+            tableName: "DailyExpenseSummary",
+            fieldMetadata: {
+                id: {columnName: "id"},
+                date: {columnName: "date"},
+                totalAmount: {columnName: "totalAmount"},
+                expensecategoryId: {columnName: "expensecategoryId"},
+                "ExpenseCategory.id": {relation: {entityName: "ExpenseCategory", refField: "id"}},
+                "ExpenseCategory.name": {relation: {entityName: "ExpenseCategory", refField: "name"}},
+                "ExpenseCategory.description": {relation: {entityName: "ExpenseCategory", refField: "description"}}
+            },
+            keyFields: ["id"],
+            joinMetadata: {ExpenseCategory: {entity: ExpenseCategory, fieldName: "ExpenseCategory", refTable: "ExpenseCategory", refColumns: ["id"], joinColumns: ["expensecategoryId"], 'type: psql:ONE_TO_MANY}}
         }
     };
 
     public isolated function init(string host = "localhost", string? user = "root", string? password = (), string? database = (),
-        int port = 3306, mysql:Options? options = (), sql:ConnectionPool? connectionPool = ()) returns persist:Error? {
+            int port = 3306, mysql:Options? options = (), sql:ConnectionPool? connectionPool = ()) returns persist:Error? {
         mysql:Client|error dbClient = new (host = host, user = user, password = password, database = database, port = port, options = options);
         if dbClient is error {
             return <persist:Error>error(dbClient.message());
@@ -94,7 +115,8 @@ public isolated client class Client {
         self.persistClients = {
             [EXPENSE_ITEM] : check new (dbClient, self.metadata.get(EXPENSE_ITEM), psql:MYSQL_SPECIFICS),
             [EXPENSE_CATEGORY] : check new (dbClient, self.metadata.get(EXPENSE_CATEGORY), psql:MYSQL_SPECIFICS),
-            [CATEGORY_BUDGET] : check new (dbClient, self.metadata.get(CATEGORY_BUDGET), psql:MYSQL_SPECIFICS)
+            [CATEGORY_BUDGET] : check new (dbClient, self.metadata.get(CATEGORY_BUDGET), psql:MYSQL_SPECIFICS),
+            [DAILY_EXPENSE_SUMMARY] : check new (dbClient, self.metadata.get(DAILY_EXPENSE_SUMMARY), psql:MYSQL_SPECIFICS)
         };
     }
 
@@ -210,6 +232,45 @@ public isolated client class Client {
         psql:SQLClient sqlClient;
         lock {
             sqlClient = self.persistClients.get(CATEGORY_BUDGET);
+        }
+        _ = check sqlClient.runDeleteQuery(id);
+        return result;
+    }
+
+    isolated resource function get dailyexpensesummaries(DailyExpenseSummaryTargetType targetType = <>, sql:ParameterizedQuery whereClause = ``, sql:ParameterizedQuery orderByClause = ``, sql:ParameterizedQuery limitClause = ``, sql:ParameterizedQuery groupByClause = ``) returns stream<targetType, persist:Error?> = @java:Method {
+        'class: "io.ballerina.stdlib.persist.sql.datastore.MySQLProcessor",
+        name: "query"
+    } external;
+
+    isolated resource function get dailyexpensesummaries/[string id](DailyExpenseSummaryTargetType targetType = <>) returns targetType|persist:Error = @java:Method {
+        'class: "io.ballerina.stdlib.persist.sql.datastore.MySQLProcessor",
+        name: "queryOne"
+    } external;
+
+    isolated resource function post dailyexpensesummaries(DailyExpenseSummaryInsert[] data) returns string[]|persist:Error {
+        psql:SQLClient sqlClient;
+        lock {
+            sqlClient = self.persistClients.get(DAILY_EXPENSE_SUMMARY);
+        }
+        _ = check sqlClient.runBatchInsertQuery(data);
+        return from DailyExpenseSummaryInsert inserted in data
+            select inserted.id;
+    }
+
+    isolated resource function put dailyexpensesummaries/[string id](DailyExpenseSummaryUpdate value) returns DailyExpenseSummary|persist:Error {
+        psql:SQLClient sqlClient;
+        lock {
+            sqlClient = self.persistClients.get(DAILY_EXPENSE_SUMMARY);
+        }
+        _ = check sqlClient.runUpdateQuery(id, value);
+        return self->/dailyexpensesummaries/[id].get();
+    }
+
+    isolated resource function delete dailyexpensesummaries/[string id]() returns DailyExpenseSummary|persist:Error {
+        DailyExpenseSummary result = check self->/dailyexpensesummaries/[id].get();
+        psql:SQLClient sqlClient;
+        lock {
+            sqlClient = self.persistClients.get(DAILY_EXPENSE_SUMMARY);
         }
         _ = check sqlClient.runDeleteQuery(id);
         return result;

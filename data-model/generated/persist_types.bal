@@ -60,6 +60,7 @@ public type ExpenseCategoryWithRelations record {|
     *ExpenseCategoryOptionalized;
     CategoryBudgetOptionalized categoryBudget?;
     ExpenseItemOptionalized[] expenseItems?;
+    DailyExpenseSummaryOptionalized[] dailyExpenseSummaryLines?;
 |};
 
 public type ExpenseCategoryTargetType typedesc<ExpenseCategoryWithRelations>;
@@ -101,5 +102,34 @@ public type CategoryBudgetUpdate record {|
     decimal amount?;
     string year?;
     string month?;
+|};
+
+public type DailyExpenseSummary record {|
+    readonly string id;
+    time:Date date;
+    decimal totalAmount;
+    string expensecategoryId;
+|};
+
+public type DailyExpenseSummaryOptionalized record {|
+    string id?;
+    time:Date date?;
+    decimal totalAmount?;
+    string expensecategoryId?;
+|};
+
+public type DailyExpenseSummaryWithRelations record {|
+    *DailyExpenseSummaryOptionalized;
+    ExpenseCategoryOptionalized ExpenseCategory?;
+|};
+
+public type DailyExpenseSummaryTargetType typedesc<DailyExpenseSummaryWithRelations>;
+
+public type DailyExpenseSummaryInsert DailyExpenseSummary;
+
+public type DailyExpenseSummaryUpdate record {|
+    time:Date date?;
+    decimal totalAmount?;
+    string expensecategoryId?;
 |};
 
