@@ -18,7 +18,7 @@
 
 -- Hear are the corrected queries. I had to manually update them.
 CREATE TABLE DailyExpenseSummary (
-    `id` VARCHAR(191) NOT NULL,
+    `id` VARCHAR(191) NOT NULL PRIMARY KEY,
     `date` DATE NOT NULL,
     `totalAmount` DECIMAL(65,30) NOT NULL,
     `expensecategoryId` VARCHAR(191) NOT NULL

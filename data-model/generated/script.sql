@@ -6,12 +6,20 @@
 DROP TABLE IF EXISTS `CategoryBudget`;
 DROP TABLE IF EXISTS `DailyExpenseSummary`;
 DROP TABLE IF EXISTS `ExpenseItem`;
+DROP TABLE IF EXISTS `SummaryCalculationTracker`;
 DROP TABLE IF EXISTS `ExpenseCategory`;
 
 CREATE TABLE `ExpenseCategory` (
 	`id` VARCHAR(191) NOT NULL,
 	`name` VARCHAR(191) NOT NULL,
 	`description` VARCHAR(191) NOT NULL,
+	PRIMARY KEY(`id`)
+);
+
+CREATE TABLE `SummaryCalculationTracker` (
+	`id` VARCHAR(191) NOT NULL,
+	`lastCalculatedDate` DATE NOT NULL,
+	`updatedAt` TIMESTAMP NOT NULL,
 	PRIMARY KEY(`id`)
 );
 
@@ -32,6 +40,8 @@ CREATE TABLE `DailyExpenseSummary` (
 	`id` VARCHAR(191) NOT NULL,
 	`date` DATE NOT NULL,
 	`totalAmount` DECIMAL(65,30) NOT NULL,
+	`createdAt` TIMESTAMP NOT NULL,
+	`updatedAt` TIMESTAMP NOT NULL,
 	`expensecategoryId` VARCHAR(191) NOT NULL,
 	FOREIGN KEY(`expensecategoryId`) REFERENCES `ExpenseCategory`(`id`),
 	PRIMARY KEY(`id`)

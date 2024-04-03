@@ -109,6 +109,8 @@ public type DailyExpenseSummary record {|
     time:Date date;
     decimal totalAmount;
     string expensecategoryId;
+    time:Utc createdAt;
+    time:Utc updatedAt;
 |};
 
 public type DailyExpenseSummaryOptionalized record {|
@@ -116,6 +118,8 @@ public type DailyExpenseSummaryOptionalized record {|
     time:Date date?;
     decimal totalAmount?;
     string expensecategoryId?;
+    time:Utc createdAt?;
+    time:Utc updatedAt?;
 |};
 
 public type DailyExpenseSummaryWithRelations record {|
@@ -131,5 +135,28 @@ public type DailyExpenseSummaryUpdate record {|
     time:Date date?;
     decimal totalAmount?;
     string expensecategoryId?;
+    time:Utc createdAt?;
+    time:Utc updatedAt?;
+|};
+
+public type SummaryCalculationTracker record {|
+    readonly string id;
+    time:Date lastCalculatedDate;
+    time:Utc updatedAt;
+|};
+
+public type SummaryCalculationTrackerOptionalized record {|
+    string id?;
+    time:Date lastCalculatedDate?;
+    time:Utc updatedAt?;
+|};
+
+public type SummaryCalculationTrackerTargetType typedesc<SummaryCalculationTrackerOptionalized>;
+
+public type SummaryCalculationTrackerInsert SummaryCalculationTracker;
+
+public type SummaryCalculationTrackerUpdate record {|
+    time:Date lastCalculatedDate?;
+    time:Utc updatedAt?;
 |};
 

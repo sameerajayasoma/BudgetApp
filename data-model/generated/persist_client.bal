@@ -12,6 +12,7 @@ const EXPENSE_ITEM = "expenseitems";
 const EXPENSE_CATEGORY = "expensecategories";
 const CATEGORY_BUDGET = "categorybudgets";
 const DAILY_EXPENSE_SUMMARY = "dailyexpensesummaries";
+const SUMMARY_CALCULATION_TRACKER = "summarycalculationtrackers";
 
 public isolated client class Client {
     *persist:AbstractPersistClient;
@@ -63,7 +64,9 @@ public isolated client class Client {
                 "dailyExpenseSummaryLines[].id": {relation: {entityName: "dailyExpenseSummaryLines", refField: "id"}},
                 "dailyExpenseSummaryLines[].date": {relation: {entityName: "dailyExpenseSummaryLines", refField: "date"}},
                 "dailyExpenseSummaryLines[].totalAmount": {relation: {entityName: "dailyExpenseSummaryLines", refField: "totalAmount"}},
-                "dailyExpenseSummaryLines[].expensecategoryId": {relation: {entityName: "dailyExpenseSummaryLines", refField: "expensecategoryId"}}
+                "dailyExpenseSummaryLines[].expensecategoryId": {relation: {entityName: "dailyExpenseSummaryLines", refField: "expensecategoryId"}},
+                "dailyExpenseSummaryLines[].createdAt": {relation: {entityName: "dailyExpenseSummaryLines", refField: "createdAt"}},
+                "dailyExpenseSummaryLines[].updatedAt": {relation: {entityName: "dailyExpenseSummaryLines", refField: "updatedAt"}}
             },
             keyFields: ["id"],
             joinMetadata: {
@@ -96,12 +99,24 @@ public isolated client class Client {
                 date: {columnName: "date"},
                 totalAmount: {columnName: "totalAmount"},
                 expensecategoryId: {columnName: "expensecategoryId"},
+                createdAt: {columnName: "createdAt"},
+                updatedAt: {columnName: "updatedAt"},
                 "ExpenseCategory.id": {relation: {entityName: "ExpenseCategory", refField: "id"}},
                 "ExpenseCategory.name": {relation: {entityName: "ExpenseCategory", refField: "name"}},
                 "ExpenseCategory.description": {relation: {entityName: "ExpenseCategory", refField: "description"}}
             },
             keyFields: ["id"],
             joinMetadata: {ExpenseCategory: {entity: ExpenseCategory, fieldName: "ExpenseCategory", refTable: "ExpenseCategory", refColumns: ["id"], joinColumns: ["expensecategoryId"], 'type: psql:ONE_TO_MANY}}
+        },
+        [SUMMARY_CALCULATION_TRACKER] : {
+            entityName: "SummaryCalculationTracker",
+            tableName: "SummaryCalculationTracker",
+            fieldMetadata: {
+                id: {columnName: "id"},
+                lastCalculatedDate: {columnName: "lastCalculatedDate"},
+                updatedAt: {columnName: "updatedAt"}
+            },
+            keyFields: ["id"]
         }
     };
 
@@ -116,7 +131,8 @@ public isolated client class Client {
             [EXPENSE_ITEM] : check new (dbClient, self.metadata.get(EXPENSE_ITEM), psql:MYSQL_SPECIFICS),
             [EXPENSE_CATEGORY] : check new (dbClient, self.metadata.get(EXPENSE_CATEGORY), psql:MYSQL_SPECIFICS),
             [CATEGORY_BUDGET] : check new (dbClient, self.metadata.get(CATEGORY_BUDGET), psql:MYSQL_SPECIFICS),
-            [DAILY_EXPENSE_SUMMARY] : check new (dbClient, self.metadata.get(DAILY_EXPENSE_SUMMARY), psql:MYSQL_SPECIFICS)
+            [DAILY_EXPENSE_SUMMARY] : check new (dbClient, self.metadata.get(DAILY_EXPENSE_SUMMARY), psql:MYSQL_SPECIFICS),
+            [SUMMARY_CALCULATION_TRACKER] : check new (dbClient, self.metadata.get(SUMMARY_CALCULATION_TRACKER), psql:MYSQL_SPECIFICS)
         };
     }
 
@@ -271,6 +287,45 @@ public isolated client class Client {
         psql:SQLClient sqlClient;
         lock {
             sqlClient = self.persistClients.get(DAILY_EXPENSE_SUMMARY);
+        }
+        _ = check sqlClient.runDeleteQuery(id);
+        return result;
+    }
+
+    isolated resource function get summarycalculationtrackers(SummaryCalculationTrackerTargetType targetType = <>, sql:ParameterizedQuery whereClause = ``, sql:ParameterizedQuery orderByClause = ``, sql:ParameterizedQuery limitClause = ``, sql:ParameterizedQuery groupByClause = ``) returns stream<targetType, persist:Error?> = @java:Method {
+        'class: "io.ballerina.stdlib.persist.sql.datastore.MySQLProcessor",
+        name: "query"
+    } external;
+
+    isolated resource function get summarycalculationtrackers/[string id](SummaryCalculationTrackerTargetType targetType = <>) returns targetType|persist:Error = @java:Method {
+        'class: "io.ballerina.stdlib.persist.sql.datastore.MySQLProcessor",
+        name: "queryOne"
+    } external;
+
+    isolated resource function post summarycalculationtrackers(SummaryCalculationTrackerInsert[] data) returns string[]|persist:Error {
+        psql:SQLClient sqlClient;
+        lock {
+            sqlClient = self.persistClients.get(SUMMARY_CALCULATION_TRACKER);
+        }
+        _ = check sqlClient.runBatchInsertQuery(data);
+        return from SummaryCalculationTrackerInsert inserted in data
+            select inserted.id;
+    }
+
+    isolated resource function put summarycalculationtrackers/[string id](SummaryCalculationTrackerUpdate value) returns SummaryCalculationTracker|persist:Error {
+        psql:SQLClient sqlClient;
+        lock {
+            sqlClient = self.persistClients.get(SUMMARY_CALCULATION_TRACKER);
+        }
+        _ = check sqlClient.runUpdateQuery(id, value);
+        return self->/summarycalculationtrackers/[id].get();
+    }
+
+    isolated resource function delete summarycalculationtrackers/[string id]() returns SummaryCalculationTracker|persist:Error {
+        SummaryCalculationTracker result = check self->/summarycalculationtrackers/[id].get();
+        psql:SQLClient sqlClient;
+        lock {
+            sqlClient = self.persistClients.get(SUMMARY_CALCULATION_TRACKER);
         }
         _ = check sqlClient.runDeleteQuery(id);
         return result;
