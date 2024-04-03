@@ -7,12 +7,10 @@ distribution = "2201.8.5"
 [build-options]
 observabilityIncluded = true
 
-[persist]
-datastore = "mysql"
-module = "budget_app_backend.db"
+[[dependency]]
+org = "samjs"
+name = "expensetracker.dbmodel"
+version = "1.0.0"
+repository = "local"
 
-[[platform.java17.dependency]]
-groupId = "io.ballerina.stdlib"
-artifactId = "persist.sql-native"
-version = "1.2.1"
 

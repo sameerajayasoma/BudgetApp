@@ -1,12 +1,14 @@
-import budget_app_backend.db;
-
 import ballerina/http;
 import ballerina/log;
 import ballerina/persist;
 import ballerina/time;
 import ballerina/uuid;
 
-final db:Client budgetAppDb = check new ();
+import samjs/expensetracker.dbmodel as db;
+
+final db:Client budgetAppDb = check new (host = host, user = user, password = password,
+    database = database, port = port, options = connectionOptions
+);
 
 type ExpenseItemWithoutId record {|
     string description;
@@ -60,7 +62,7 @@ service /budgetapp on new http:Listener(8081) {
         } on fail var e {
             if e is persist:NotFoundError {
                 return http:NOT_FOUND;
-            } else if e is error {
+            } else {
                 log:printError("Error occurred while retrieving the expense item.", expenseItemId = id, 'error = e);
                 return http:INTERNAL_SERVER_ERROR;
             }
