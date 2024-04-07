@@ -108,7 +108,7 @@ FROM SummaryCalculationTracker;`);
 function getExpenseItemsInDateRange(dbmodel:Client expenseAppDb, time:Civil startDate, time:Civil endDate) returns dbmodel:ExpenseItem[]|error {
     // Using PDT time zone for now. We need to get user's time zone
     string startDateStr = string `${startDate.year}-${startDate.month}-${startDate.day} 07:00:00`;
-    string endDateStr = string `${endDate.year}-${endDate.month}-${endDate.day} 0:00:00`;
+    string endDateStr = string `${endDate.year}-${endDate.month}-${endDate.day} 07:00:00`;
     stream<dbmodel:ExpenseItem, error?> queryNativeSQL = expenseAppDb->queryNativeSQL(`SELECT * FROM ExpenseItem WHERE dateTime >= ${startDateStr} AND dateTime < ${endDateStr}`);
     return from var item in queryNativeSQL
         select item;
