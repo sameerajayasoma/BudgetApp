@@ -4,21 +4,27 @@ import ballerina/uuid;
 
 import samjs/expensetracker.dbmodel;
 
+// Assume that the last summarized date is 2024-04-02.
+// This means that all the expenses of 2024-04-02 and before are summarized.
+// There is a catch, this is in UTC. We need to convert this to the user's time zone
+// I am using PDT for now.
+// Which means that expenses before 2024-04-03 00:00:00 PDT are summarized.
+// The same value in UTC is 2024-04-03 07:00:00 UTC. 
+// Becuase expense dataTime is in UTC, we need to convert the user's time to UTC. 
+
+// For the next summarization:
+// StatDateTime is 2024-04-03 07:00:00 UTC. 
+// If the current time is 2024-04-07 04:00:00 UTC. 
+// Then we need to loop through the days from 2024-04-03 07:00:00 UTC to 2024-04-06 07:00:00 UTC
+// We need to summarize the expenses of 2024-04-03, 2024-04-04, 2024-04-05, 2024-04-06
+// The expenses of 2024-04-07 are not summarized.
+// When a day is summarized insert the summary to the database as well as the last summarized date.
+
 # This function is used to summarize the daily expenses
 # It will summarize the expenses from the day after the last summarized date to yesterday(inclusive)
 # + expenseAppDb - The database client
 # + return - error if there is an error in the process
 function summarizeDailyExpenses(dbmodel:Client expenseAppDb) returns error? {
-    // Current time in UTC 2024-04-05 19:20:00 UTC
-    // Current time in PDT 2024-04-05 12:20:00 PDT
-    // My idea is to summarize the complete days from the day after the last summarized date to the yesterday(inclusive)
-    // Say, the last summarized date is 2024-04-01. That means all expense of that day is summarized.
-    // We need to start the summary from 2024-04-02 00:00:00 UTC to yesterday 2024-04-04 23:59:59 UTC
-
-    // 2024-04-04 08:00:00 UTC ==> 2024-04-04 00:00:00 PDT
-    // Hard coding the time to 8:00:00 for now 
-    // TODO we need the users time zone to calculate the start of the day
-
     // Get the last summarized date
     time:Date|error lastSummarizedDate = getLastSummarizedDate(expenseAppDb);
     if lastSummarizedDate is error {
@@ -27,27 +33,37 @@ function summarizeDailyExpenses(dbmodel:Client expenseAppDb) returns error? {
     }
 
     time:Utc startDateInUtc = check getStartDateInUtc(lastSummarizedDate);
+    log:printInfo("Start date in UTC: ", startDate = time:utcToString(startDateInUtc));
     time:Utc todayInUtc = check getTodayPDTStartTimeInUtc();
+    log:printInfo("Today in UTC: ", today = time:utcToString(todayInUtc));
 
     time:Utc currentDateInUtc = startDateInUtc;
-    while currentDateInUtc < todayInUtc {
+    time:Utc nextDateInUtc = time:utcAddSeconds(currentDateInUtc, 60 * 60 * 24);
+    while nextDateInUtc <= todayInUtc {
         time:Civil currentDateInCivil = time:utcToCivil(currentDateInUtc);
-
-        // Get the next date
-        time:Utc nextDateInUtc = time:utcAddSeconds(currentDateInUtc, 60 * 60 * 24);
+        log:printInfo("Current date in civil: ", currentDate = time:utcToString(currentDateInUtc));
         time:Civil nextDateInCivil = time:utcToCivil(nextDateInUtc);
-        dbmodel:DailyExpenseSummary[] summaryItems = check getSummarizedExpensesInDateRange(expenseAppDb, currentDateInCivil, nextDateInCivil);
+        log:printInfo("Next date in civil: ", nextDate = time:utcToString(nextDateInUtc));
 
-        // Insert the summary to the database
-        if summaryItems.length() == 0 {
-            continue;
+        // Get the expenses of the current date range
+        dbmodel:DailyExpenseSummary[] summaryItems = check getSummarizedExpensesInDateRange(expenseAppDb, currentDateInCivil, nextDateInCivil);
+        if summaryItems.length() != 0 {
+            // Ff this fails, do not contine to the next date. Log the error and return
+            _ = check expenseAppDb->/dailyexpensesummaries.post(summaryItems);
+
+            // Update the last summarized date in SummaryCalculationTracker
+            time:Date newLastSummarizedDate = {year: currentDateInCivil.year, month: currentDateInCivil.month, day: currentDateInCivil.day};
+            _ = check expenseAppDb->/summarycalculationtrackers.post([
+                {
+                    id: uuid:createType4AsString(),
+                    lastCalculatedDate: newLastSummarizedDate,
+                    updatedAt: time:utcNow()
+                }
+            ]);
         }
 
-        // TODO IF this fails, do not contine to the next date. Log the error and return
-        _ = check expenseAppDb->/dailyexpensesummaries.post(summaryItems);
-        // TODO Update the last summarized date in SummaryCalculationTracker
-
         currentDateInUtc = nextDateInUtc;
+        nextDateInUtc = time:utcAddSeconds(currentDateInUtc, 60 * 60 * 24);
     }
 }
 
@@ -91,8 +107,8 @@ FROM SummaryCalculationTracker;`);
 
 function getExpenseItemsInDateRange(dbmodel:Client expenseAppDb, time:Civil startDate, time:Civil endDate) returns dbmodel:ExpenseItem[]|error {
     // Using PDT time zone for now. We need to get user's time zone
-    string startDateStr = string `${startDate.year}-${startDate.month}-${startDate.day} 08:00:00`;
-    string endDateStr = string `${endDate.year}-${endDate.month}-${endDate.day} 08:00:00`;
+    string startDateStr = string `${startDate.year}-${startDate.month}-${startDate.day} 07:00:00`;
+    string endDateStr = string `${endDate.year}-${endDate.month}-${endDate.day} 0:00:00`;
     stream<dbmodel:ExpenseItem, error?> queryNativeSQL = expenseAppDb->queryNativeSQL(`SELECT * FROM ExpenseItem WHERE dateTime >= ${startDateStr} AND dateTime < ${endDateStr}`);
     return from var item in queryNativeSQL
         select item;
@@ -124,7 +140,7 @@ function getTodayPDTStartTimeInUtc() returns time:Utc|error {
         year: todayInCivil.year,
         month: todayInCivil.month,
         day: todayInCivil.day,
-        hour: 8,
+        hour: 7,
         minute: 0,
         second: 0,
         utcOffset: time:Z
@@ -133,11 +149,14 @@ function getTodayPDTStartTimeInUtc() returns time:Utc|error {
 }
 
 function getStartDateInUtc(time:Date lastSummarizedDate) returns time:Utc|error {
+    // Convert to the user's time zone. Hard coding PDT for now. 
+    // TODO: Get the user's time zone
+    // TODO: Use proper time zone conversion
     time:Civil lastSummarizedCivilDate = {
         year: lastSummarizedDate.year,
         month: lastSummarizedDate.month,
         day: lastSummarizedDate.day,
-        hour: 8,
+        hour: 7,
         minute: 0,
         second: 0,
         utcOffset: time:Z
