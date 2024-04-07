@@ -28,3 +28,7 @@ ADD COLUMN `createdAt` TIMESTAMP NOT NULL;
 
 ALTER TABLE DailyExpenseSummary
 ADD COLUMN `updatedAt` TIMESTAMP NOT NULL;
+
+
+-- Inserting the initial data with UUID
+INSERT INTO SummaryCalculationTracker (`id`, `lastCalculatedDate`, `updatedAt`) VALUES ('5e22ff8t-755a-4727-9061-0f7594c5c4db', '2024-02-01', '2024-02-01 00:00:00');

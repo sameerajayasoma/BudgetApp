@@ -23,10 +23,15 @@ Replate the generate Client's init function signature with the following. This i
 
 #### Generate migration scripts 
 ```shell
-
+bal persist migrate "lable_goes_here"
 ```
 
 #### Publish the library to the local repository 
 ```shell
 bal pack;bal push --repository=local
+```
+
+#### Publish the library to Ballerina Central 
+```shell
+bal pack;bal push
 ```
