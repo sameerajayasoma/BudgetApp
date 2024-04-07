@@ -132,13 +132,16 @@ function loadEmailData(dbmodel:Client expenseAppDb) returns EmailData|error {
 }
 
 function getTodayStartTime() returns time:Utc|error {
+    // Return Today startTime in Pacific Time
+    // Get current UTC time and reduce 7 hours to get Pacific Time. Then set time to 07:00:00 to the date. 
     time:Utc utcNow = time:utcNow();
-    time:Civil civilNow = time:utcToCivil(utcNow);
+    time:Utc pacificNow = time:utcAddSeconds(utcNow, -60 * 60 * 7);
+    time:Civil civilNow = time:utcToCivil(pacificNow);
     civilNow = {
         year: civilNow.year,
         month: civilNow.month,
         day: civilNow.day,
-        hour: 0,
+        hour: 7,
         minute: 0,
         second: 0,
         utcOffset: time:Z
@@ -180,7 +183,9 @@ function calculateCategoryTotalData(map<decimal> categoryTotals, map<string> cat
         CategoryTotalData categoryTotal = {category: categoryName, total: total};
         categoryTotalData.push(categoryTotal);
     }
-    return categoryTotalData;
+    return from var element in categoryTotalData
+        order by element.category ascending
+        select element;
 }
 
 function getCategoryIdToNameMap(dbmodel:Client expenseAppDb) returns map<string>|error {
