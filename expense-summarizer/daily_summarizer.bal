@@ -34,7 +34,7 @@ function summarizeDailyExpenses(dbmodel:Client expenseAppDb) returns error? {
 
     time:Utc startDateInUtc = check getStartDateInUtc(lastSummarizedDate);
     log:printInfo("Start date in UTC: ", startDate = time:utcToString(startDateInUtc));
-    time:Utc todayInUtc = check getTodayPDTStartTimeInUtc();
+    time:Utc todayInUtc = check getTodayTimeInUtc();
     log:printInfo("Today in UTC: ", today = time:utcToString(todayInUtc));
 
     time:Utc currentDateInUtc = startDateInUtc;
@@ -134,18 +134,19 @@ function getSummarizedExpensesInDateRange(dbmodel:Client expenseAppDb, time:Civi
     return summaryItems;
 }
 
-function getTodayPDTStartTimeInUtc() returns time:Utc|error {
-    time:Civil todayInCivil = time:utcToCivil(time:utcNow());
-    time:Civil todayStartTimeInCivil = {
-        year: todayInCivil.year,
-        month: todayInCivil.month,
-        day: todayInCivil.day,
-        hour: 7,
-        minute: 0,
-        second: 0,
-        utcOffset: time:Z
-    };
-    return time:utcFromCivil(todayStartTimeInCivil);
+function getTodayTimeInUtc() returns time:Utc|error {
+    // time:Civil todayInCivil = time:utcToCivil(time:utcNow());
+    // time:Civil todayStartTimeInCivil = {
+    //     year: todayInCivil.year,
+    //     month: todayInCivil.month,
+    //     day: todayInCivil.day,
+    //     hour: 7,
+    //     minute: 0,
+    //     second: 0,
+    //     utcOffset: time:Z
+    // };
+    // return time:utcFromCivil(todayStartTimeInCivil);
+    return time:utcNow();
 }
 
 function getStartDateInUtc(time:Date lastSummarizedDate) returns time:Utc|error {
