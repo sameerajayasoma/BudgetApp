@@ -92,7 +92,8 @@ function loadEmailData(dbmodel:Client expenseAppDb) returns EmailData|error {
     ExpenseItemData[] todayExpenses = from var {description, amount, categoryId, dateTime} in expenseItems
         select {description, amount, date: getDateString(dateTime), category: categoryIdToNameMap.get(categoryId)};
 
-    dbmodel:DailyExpenseSummary[] todayExpenseSummary = check getDailyCategorySummaryInRange(expenseAppDb, todayCivil, tomorrowCivil);
+    // Today expenses are not yet summarized. So, we need to summarize them.
+    dbmodel:DailyExpenseSummary[] todayExpenseSummary = check summarizeExpensesInDateRange(expenseAppDb, todayCivil, tomorrowCivil);
     DailySummaryData todaySummary = {
         date: getDateString(todayCivil),
         total: from var {totalAmount} in todayExpenseSummary

@@ -46,7 +46,7 @@ function summarizeDailyExpenses(dbmodel:Client expenseAppDb) returns error? {
         log:printInfo("Next date in civil: ", nextDate = time:utcToString(nextDateInUtc));
 
         // Get the expenses of the current date range
-        dbmodel:DailyExpenseSummary[] summaryItems = check getSummarizedExpensesInDateRange(expenseAppDb, currentDateInCivil, nextDateInCivil);
+        dbmodel:DailyExpenseSummary[] summaryItems = check summarizeExpensesInDateRange(expenseAppDb, currentDateInCivil, nextDateInCivil);
         if summaryItems.length() != 0 {
             // Ff this fails, do not contine to the next date. Log the error and return
             _ = check expenseAppDb->/dailyexpensesummaries.post(summaryItems);
@@ -114,7 +114,7 @@ function getExpenseItemsInDateRange(dbmodel:Client expenseAppDb, time:Civil star
         select item;
 }
 
-function getSummarizedExpensesInDateRange(dbmodel:Client expenseAppDb, time:Civil startDate, time:Civil endDate) returns dbmodel:DailyExpenseSummary[]|error {
+function summarizeExpensesInDateRange(dbmodel:Client expenseAppDb, time:Civil startDate, time:Civil endDate) returns dbmodel:DailyExpenseSummary[]|error {
     dbmodel:ExpenseItem[] expenseItems = check getExpenseItemsInDateRange(expenseAppDb, startDate, endDate);
     table<CategoryTotal> key(categoryId) categoryIdToTotal = calculateCategoryTotals(expenseItems, {year: startDate.year, month: startDate.month, day: startDate.day});
 
