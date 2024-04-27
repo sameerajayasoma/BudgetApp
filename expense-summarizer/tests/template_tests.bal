@@ -28,6 +28,7 @@ function testEmailBodyGeneration() returns error? {
         pastSevenDaysSummary: {
             startDate: "2021-08-25",
             endDate: "2021-09-01",
+            total: 250.0,
             categoryTotals: [
                 {category: "Food", total: 100.0},
                 {category: "Transport", total: 150.0}
@@ -36,6 +37,7 @@ function testEmailBodyGeneration() returns error? {
         pastThirtyDaysSummary: {
             startDate: "2021-08-25",
             endDate: "2021-09-01",
+            total: 750.0,
             categoryTotals: [
                 {category: "Food", total: 300.0},
                 {category: "Transport", total: 450.0}
