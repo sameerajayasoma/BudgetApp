@@ -26,6 +26,7 @@ type DailySummaryData record {
 type AggregatedData record {
     string startDate;
     string endDate;
+    decimal total;
     CategoryTotalData[] categoryTotals;
 };
 
@@ -113,6 +114,8 @@ function loadEmailData(dbmodel:Client expenseAppDb) returns EmailData|error {
     AggregatedData pastSevenDaysSummary = {
         startDate: getDateString(sevenDaysAgoCivil),
         endDate: getDateString(todayCivil),
+        total: from var {totalAmount} in pastSevenDaysExpenseSummary
+            collect sum(totalAmount),
         categoryTotals: calculateCategoryTotalData(calculateCategoryIdTotals(pastSevenDaysExpenseSummary), categoryIdToNameMap)
     };
 
@@ -120,6 +123,8 @@ function loadEmailData(dbmodel:Client expenseAppDb) returns EmailData|error {
     AggregatedData pastThirtyDaysSummary = {
         startDate: getDateString(thirtyDaysAgoCivil),
         endDate: getDateString(todayCivil),
+        total: from var {totalAmount} in pastThirtyDaysExpenseSummary
+            collect sum(totalAmount),
         categoryTotals: calculateCategoryTotalData(calculateCategoryIdTotals(pastThirtyDaysExpenseSummary), categoryIdToNameMap)
     };
 

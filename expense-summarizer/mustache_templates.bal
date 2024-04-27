@@ -99,6 +99,7 @@ string dailySummaryTemplate = string `<!DOCTYPE html>
             {{/categoryTotals}}
         </tbody>
     </table>
+    <p class="overall-total">Overall Total: {{total}}</p>
     {{/pastSevenDaysSummary}}
 
     {{#pastThirtyDaysSummary}}
@@ -119,6 +120,7 @@ string dailySummaryTemplate = string `<!DOCTYPE html>
             {{/categoryTotals}}
         </tbody>
     </table>
+    <p class="overall-total">Overall Total: {{total}}</p>
     {{/pastThirtyDaysSummary}}
 </body>
 </html>
